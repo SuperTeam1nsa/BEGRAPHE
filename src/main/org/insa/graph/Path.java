@@ -270,12 +270,12 @@ public class Path {
      */
     public double getMinimumTravelTime() {
         // TODO:
-    	double r;
+    	double r=0;
     	for(Arc a:this.arcs)
     	{
     		r += a.getMinimumTravelTime();
     	}
-        return 0;
+        return r;
     }
 
 }
