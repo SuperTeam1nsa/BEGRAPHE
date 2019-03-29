@@ -17,6 +17,15 @@ import java.util.List;
  *
  */
 public class Path {
+    // Graph containing this path.
+    private final Graph graph;
+
+    // Origin of the path
+    private final Node origin;
+
+    // List of arcs in this path.
+    private final List<Arc> arcs;
+
 
     /**
      * Create a new path that goes through the given list of nodes (in order),
@@ -94,14 +103,6 @@ public class Path {
         return path;
     }
 
-    // Graph containing this path.
-    private final Graph graph;
-
-    // Origin of the path
-    private final Node origin;
-
-    // List of arcs in this path.
-    private final List<Arc> arcs;
 
     /**
      * Create an empty path corresponding to the given graph.
@@ -198,11 +199,29 @@ public class Path {
      * 
      * @return true if the path is valid, false otherwise.
      * 
-     * @deprecated Need to be implemented.
+     *  Need to be implemented.
      */
     public boolean isValid() {
-        // TODO:
-        return false;
+        boolean valid=true;
+        if(isEmpty())
+        	return true;
+        else if(arcs.size()==0)
+        return true;
+        else if(arcs.get(0).getOrigin() != getOrigin())
+        	return false;
+        else {
+        Arc previous=arcs.get(0);
+        for(Arc i : arcs) {
+        	if(previous.getDestination()!=i.getOrigin())
+        		{valid=false;
+        		break;
+        		}
+        	previous=i;
+        }
+        }
+    	
+    	
+        return valid;
     }
 
     /**
@@ -210,11 +229,21 @@ public class Path {
      * 
      * @return Total length of the path (in meters).
      * 
-     * @deprecated Need to be implemented.
+     *  Need to be implemented.
      */
+    //un path is oneway != graph
     public float getLength() {
-        // TODO:
-        return 0;
+        // TODO
+    	float distance=0;
+    	for(Arc a:arcs) {
+    		distance+=a.getLength();
+    	}
+    	/*while(n.hasSuccessors())
+    	{
+    		distance += n.getSuccessors().get(0).getLength();
+    		n=n.getSuccessors().get(0).getDestination();
+    	}*/
+        return distance;
     }
 
     /**
