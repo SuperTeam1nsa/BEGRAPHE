@@ -227,9 +227,8 @@ public class Path {
      * 
      * @deprecated Need to be implemented.
      */
-    public double getTravelTime(double speed) {
-        // TODO:
-        return 0;
+    public double getTravelTime(double speed) {   	
+        return this.getLength()/speed;
     }
 
     /**
@@ -242,6 +241,11 @@ public class Path {
      */
     public double getMinimumTravelTime() {
         // TODO:
+    	double r;
+    	for(Arc a:this.arcs)
+    	{
+    		r += a.getMinimumTravelTime();
+    	}
         return 0;
     }
 
