@@ -3,6 +3,7 @@ package org.insa.graph;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * <p>
@@ -42,21 +43,26 @@ public class Path {
      * @deprecated Need to be implemented.
      */
     //linéaire mais avec plusieurs arcs entre 2 nodes => pas dijkstra (cf prof vendredi) 
+    /*
+     * graph = ensemble des noeuds
+     * nodes =les noeuds qu'on veut connecter pour créer le path
+     */
     public static Path createFastestPathFromNodes(Graph graph, List<Node> nodes)
             throws IllegalArgumentException {
         List<Arc> arcs = new ArrayList<Arc>();
         for( Node i:nodes){
+        	nodes.get(nodes.indexOf(i)+1);
 	        if(i.getNumberOfSuccessors()>1)
 	        {
 	        	int min=Integer.MAX_VALUE;
 	        	Arc goodone=i.getSuccessors().get(0);
 	        	for(Arc a:i.getSuccessors()){
-	        		if(a.getLength()<min)
+	        		if(a.getLength()<min &&  nodes.contains(a.getOrigin()))
 	        			goodone=a;
 	        	}
 	        	arcs.add(goodone);
 	        }
-	        else if(i.getNumberOfSuccessors()==1)
+	        else if(i.getNumberOfSuccessors()==1 && nodes.contains(i.getSuccessors().get(0).getOrigin()))//le dernier node du chemin n'est pas forcément celui du graph
 	        	arcs.add(i.getSuccessors().get(0));
         }
         Path p=new Path(graph, arcs);
@@ -224,17 +230,21 @@ public class Path {
         if(isEmpty())
         	return true;
         else if(arcs.size()==0)
-        return true;
+        	return true;
         else if(arcs.get(0).getOrigin() != getOrigin())
         	return false;
         else {
-        Arc previous=arcs.get(0);
-        for(Arc i : arcs) {
-        	if(previous.getDestination()!=i.getOrigin())
+        	System.out.print("ok");
+        ListIterator<Arc> it = arcs.listIterator();
+        Arc previous=it.next();
+        Arc current;
+        while(it.hasNext()) {
+        	current=it.next();
+        	if(previous.getDestination()!=current.getOrigin())
         		{valid=false;
         		break;
         		}
-        	previous=i;
+        	previous=current;
         }
         }
     	
