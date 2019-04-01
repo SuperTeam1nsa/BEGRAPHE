@@ -41,10 +41,28 @@ public class Path {
      * 
      * @deprecated Need to be implemented.
      */
+    //linéaire mais avec plusieurs arcs entre 2 nodes => pas dijkstra (cf prof vendredi) 
     public static Path createFastestPathFromNodes(Graph graph, List<Node> nodes)
             throws IllegalArgumentException {
         List<Arc> arcs = new ArrayList<Arc>();
-        // TODO:
+        for( Node i:nodes){
+	        if(i.getNumberOfSuccessors()>1)
+	        {
+	        	int min=Integer.MAX_VALUE;
+	        	Arc goodone=i.getSuccessors().get(0);
+	        	for(Arc a:i.getSuccessors()){
+	        		if(a.getLength()<min)
+	        			goodone=a;
+	        	}
+	        	arcs.add(goodone);
+	        }
+	        else if(i.getNumberOfSuccessors()==1)
+	        	arcs.add(i.getSuccessors().get(0));
+        }
+        Path p=new Path(graph, arcs);
+        if(p.isValid())
+        	throw new IllegalArgumentException();
+        else
         return new Path(graph, arcs);
     }
 
