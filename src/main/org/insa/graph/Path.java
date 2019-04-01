@@ -285,7 +285,7 @@ public class Path {
      *  Need to be implemented.
      */
     public double getTravelTime(double speed) {   	
-        return this.getLength()/speed;
+        return ((double)(this.getLength()/1000))/(speed/3600);
     }
 
     /**
