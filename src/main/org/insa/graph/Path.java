@@ -98,7 +98,7 @@ public class Path {
 	        	previous=current;
 	        }
         } 
-        else{
+        else{ 
 	        	return new Path(graph);
 	        }
         if(nodes.size()==1)
