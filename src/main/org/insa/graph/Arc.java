@@ -1,5 +1,6 @@
 package org.insa.graph;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -17,14 +18,19 @@ import java.util.List;
  * </p>
  *
  */
-public abstract class Arc {
+public abstract class Arc implements Comparator<Arc> {
 
     /**
      * @return Origin node of this arc.
      */
     public abstract Node getOrigin();
 
-    /**
+    @Override
+	public int compare(Arc o1, Arc o2) {
+		return (int)(o1.getLength()-o2.getLength());
+	}
+
+	/**
      * @return Destination node of this arc.
      */
     public abstract Node getDestination();

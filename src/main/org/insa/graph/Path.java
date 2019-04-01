@@ -2,6 +2,7 @@ package org.insa.graph;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -39,37 +40,13 @@ public class Path {
      * 
      * @throws IllegalArgumentException If the list of nodes is not valid, i.e. two
      *         consecutive nodes in the list are not connected in the graph.
-     * 
-     * @deprecated Need to be implemented.
+       * @deprecated Need to be implemented.
      */
-    //linéaire mais avec plusieurs arcs entre 2 nodes => pas dijkstra (cf prof vendredi) 
-    /*
-     * graph = ensemble des noeuds
-     * nodes =les noeuds qu'on veut connecter pour créer le path
-     */
+    
     public static Path createFastestPathFromNodes(Graph graph, List<Node> nodes)
             throws IllegalArgumentException {
-        List<Arc> arcs = new ArrayList<Arc>();
-        for( Node i:nodes){
-        	nodes.get(nodes.indexOf(i)+1);
-	        if(i.getNumberOfSuccessors()>1)
-	        {
-	        	int min=Integer.MAX_VALUE;
-	        	Arc goodone=i.getSuccessors().get(0);
-	        	for(Arc a:i.getSuccessors()){
-	        		if(a.getLength()<min &&  nodes.contains(a.getOrigin()))
-	        			goodone=a;
-	        	}
-	        	arcs.add(goodone);
-	        }
-	        else if(i.getNumberOfSuccessors()==1 && nodes.contains(i.getSuccessors().get(0).getOrigin()))//le dernier node du chemin n'est pas forcément celui du graph
-	        	arcs.add(i.getSuccessors().get(0));
-        }
-        Path p=new Path(graph, arcs);
-        if(p.isValid())
-        	throw new IllegalArgumentException();
-        else
-        return new Path(graph, arcs);
+    	List<Arc> arcs = new ArrayList<Arc>();
+    	 return new Path(graph, arcs);
     }
 
     /**
@@ -84,12 +61,49 @@ public class Path {
      * @throws IllegalArgumentException If the list of nodes is not valid, i.e. two
      *         consecutive nodes in the list are not connected in the graph.
      * 
-     * @deprecated Need to be implemented.
+     */
+  //linéaire mais avec plusieurs arcs entre 2 nodes => pas dijkstra (cf prof vendredi) 
+    /*
+     * graph = ensemble des noeuds
+     * nodes =les noeuds qu'on veut connecter pour créer le path
      */
     public static Path createShortestPathFromNodes(Graph graph, List<Node> nodes)
             throws IllegalArgumentException {
-        List<Arc> arcs = new ArrayList<Arc>();
-        // TODO:
+    	List<Arc> arcs = new ArrayList<Arc>();
+        List<Arc> successors= new ArrayList<Arc>();
+        List<Arc> chemins_possibles= new ArrayList<Arc>();
+        ListIterator<Node> it = nodes.listIterator();
+        if(it.hasNext()) {
+	        Node previous=it.next();
+	        Node current;
+	        boolean notValid=false;
+	        while(it.hasNext()) {
+	        	current=it.next();
+	        	successors=previous.getSuccessors();
+	
+	        	//le dernier noeud n'a pas de successeur mais le path est valide
+	        	if(successors.size() !=0)
+	            	notValid=true;
+	        	chemins_possibles.clear();
+	        	for(Arc a:successors) {
+	        		if(a.getDestination()==current)
+	        			{notValid=false;
+	        			chemins_possibles.add(a);
+	        			}
+	        	}
+	        	if(notValid)
+	        		throw new IllegalArgumentException();
+	        	chemins_possibles.sort(chemins_possibles.get(0));
+	        	arcs.add(chemins_possibles.get(0));
+	        	previous=current;
+	        }
+        } 
+        else{
+	        	return new Path(graph);
+	        }
+        if(nodes.size()==1)
+        return new Path(graph, nodes.get(0));
+        else
         return new Path(graph, arcs);
     }
 
@@ -163,7 +177,8 @@ public class Path {
         this.origin = arcs.size() > 0 ? arcs.get(0).getOrigin() : null;
     }
 
-    /**
+
+	/**
      * @return Graph containing the path.
      */
     public Graph getGraph() {
@@ -234,7 +249,6 @@ public class Path {
         else if(arcs.get(0).getOrigin() != getOrigin())
         	return false;
         else {
-        	System.out.print("ok");
         ListIterator<Arc> it = arcs.listIterator();
         Arc previous=it.next();
         Arc current;
