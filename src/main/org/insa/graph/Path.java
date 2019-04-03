@@ -40,13 +40,67 @@ public class Path {
      * 
      * @throws IllegalArgumentException If the list of nodes is not valid, i.e. two
      *         consecutive nodes in the list are not connected in the graph.
-       * @deprecated Need to be implemented.
+       *
      */
     
     public static Path createFastestPathFromNodes(Graph graph, List<Node> nodes)
             throws IllegalArgumentException {
+        ListIterator<Node> nodeit=nodes.listIterator();
     	List<Arc> arcs = new ArrayList<Arc>();
-    	 return new Path(graph, arcs);
+        List<Arc> successors= new ArrayList<Arc>();
+        List <Arc> fastest=new ArrayList<Arc>(); 
+        double fastest_time ;
+        
+        if (nodeit.hasNext()){
+            Node current=nodeit.next(); 
+            Node next;
+            while (nodeit.hasNext())
+            {   
+                next=nodeit.next();
+                successors=current.getSuccessors();
+                fastest_time=Double.MAX_VALUE;
+                boolean Linked=false;
+                for (Arc a:successors)
+                {   
+
+                    if (a.getDestination()==next )
+                     {  
+                        Linked=true;
+                         if(a.getMinimumTravelTime()<fastest_time)
+                        {
+                            fastest.add(0,a);
+                            fastest_time=fastest.get(0).getMinimumTravelTime();
+                            
+
+                        }
+                     }
+                   
+                }
+                if (Linked)
+                {
+                    arcs.add(fastest.get(0)); 
+
+                }
+                else
+                {
+                    throw new IllegalArgumentException();
+                }
+                current=next; 
+
+            }
+
+        }
+        else 
+        {
+        return new Path(graph);
+        }
+
+         if(nodes.size()==1)
+        return new Path(graph, nodes.get(0));
+        else
+        return new Path(graph, arcs);
+    
+    	 
     }
 
     /**
@@ -62,10 +116,10 @@ public class Path {
      *         consecutive nodes in the list are not connected in the graph.
      * 
      */
-  //linéaire mais avec plusieurs arcs entre 2 nodes => pas dijkstra (cf prof vendredi) 
+  //linï¿½aire mais avec plusieurs arcs entre 2 nodes => pas dijkstra (cf prof vendredi) 
     /*
      * graph = ensemble des noeuds
-     * nodes =les noeuds qu'on veut connecter pour créer le path
+     * nodes =les noeuds qu'on veut connecter pour crï¿½er le path
      */
     public static Path createShortestPathFromNodes(Graph graph, List<Node> nodes)
             throws IllegalArgumentException {
