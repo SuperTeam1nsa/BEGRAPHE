@@ -48,59 +48,44 @@ public class Path {
         ListIterator<Node> nodeit=nodes.listIterator();
     	List<Arc> arcs = new ArrayList<Arc>();
         List<Arc> successors= new ArrayList<Arc>();
-        List <Arc> fastest=new ArrayList<Arc>(); 
+        Arc fastest = null;
         double fastest_time ;
-        
+        boolean linked;
         if (nodeit.hasNext()){
             Node current=nodeit.next(); 
             Node next;
-            while (nodeit.hasNext())
-            {   
+            while (nodeit.hasNext()) {   
                 next=nodeit.next();
                 successors=current.getSuccessors();
                 fastest_time=Double.MAX_VALUE;
-                boolean Linked=false;
-                for (Arc a:successors)
-                {   
-
-                    if (a.getDestination()==next )
-                     {  
-                        Linked=true;
-                         if(a.getMinimumTravelTime()<fastest_time)
-                        {
-                            fastest.add(0,a);
-                            fastest_time=fastest.get(0).getMinimumTravelTime();
-                            
-
+                linked=false;
+                for (Arc a:successors) {   
+                    if (a.getDestination()==next ) {  
+                        linked=true;
+                        //on cherche le plus rapide
+                         if(a.getMinimumTravelTime()<fastest_time){
+                            fastest=a;
+                            fastest_time=fastest.getMinimumTravelTime();
                         }
-                     }
-                   
+                     }  
                 }
-                if (Linked)
-                {
-                    arcs.add(fastest.get(0)); 
-
+                //s'il y a une connexion on ajoute la plus rapide
+                if (linked){
+                    arcs.add(fastest); 
                 }
-                else
-                {
+                else{
                     throw new IllegalArgumentException();
                 }
                 current=next; 
-
             }
-
         }
-        else 
-        {
+        else  {
         return new Path(graph);
         }
-
          if(nodes.size()==1)
         return new Path(graph, nodes.get(0));
         else
-        return new Path(graph, arcs);
-    
-    	 
+        return new Path(graph, arcs);   	 
     }
 
     /**
@@ -125,30 +110,33 @@ public class Path {
             throws IllegalArgumentException {
     	List<Arc> arcs = new ArrayList<Arc>();
         List<Arc> successors= new ArrayList<Arc>();
-        List<Arc> chemins_possibles= new ArrayList<Arc>();
+		Arc shortestpath=null;
         ListIterator<Node> it = nodes.listIterator();
         if(it.hasNext()) {
 	        Node previous=it.next();
 	        Node current;
-	        boolean notValid=false;
+	        boolean linked;
+	        double shortest;
 	        while(it.hasNext()) {
 	        	current=it.next();
-	        	successors=previous.getSuccessors();
-	
-	        	//le dernier noeud n'a pas de successeur mais le path est valide
-	        	if(successors.size() !=0)
-	            	notValid=true;
-	        	chemins_possibles.clear();
+	        	successors=previous.getSuccessors();	   
+	        	linked=false;
+	        	shortest=Double.MAX_VALUE;
+	        	if(successors.size()==0)//le dernier noeud n'a pas de successeur mais le path est valide
+	            	linked=true;
 	        	for(Arc a:successors) {
-	        		if(a.getDestination()==current)
-	        			{notValid=false;
-	        			chemins_possibles.add(a);
+	        		if(a.getDestination()==current){
+	        			linked=true;
+						if(a.getLength()<shortest) {
+	        			shortestpath=a;
+						shortest=a.getLength();
 	        			}
+	        		}
 	        	}
-	        	if(notValid)
+	        	if(!linked)
 	        		throw new IllegalArgumentException();
-	        	chemins_possibles.sort(chemins_possibles.get(0));
-	        	arcs.add(chemins_possibles.get(0));
+	        	//chemins_possibles.sort(chemins_possibles.get(0));
+	        	arcs.add(shortestpath);
 	        	previous=current;
 	        }
         } 

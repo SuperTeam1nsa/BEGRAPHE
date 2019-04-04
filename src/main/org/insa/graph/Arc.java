@@ -18,18 +18,18 @@ import java.util.List;
  * </p>
  *
  */
-public abstract class Arc implements Comparator<Arc> {
+public abstract class Arc /*implements Comparator<Arc> */{
 
     /**
      * @return Origin node of this arc.
      */
     public abstract Node getOrigin();
 
-    @Override
+   /* @Override
 	public int compare(Arc o1, Arc o2) {
 		return (int)(o1.getLength()-o2.getLength());
 	}
-
+*/
 	/**
      * @return Destination node of this arc.
      */
