@@ -66,7 +66,7 @@ public class Path {
                          if(a.getMinimumTravelTime()<fastest_time){
                             fastest=a;
                             fastest_time=fastest.getMinimumTravelTime();
-                        }
+                        } 
                      }  
                 }
                 //s'il y a une connexion on ajoute la plus rapide
