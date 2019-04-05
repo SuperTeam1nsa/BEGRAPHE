@@ -1,15 +1,90 @@
 package org.insa.algo.shortestpath;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.insa.algo.AbstractSolution.Status;
+import org.insa.graph.Arc;
+import org.insa.graph.Graph;
+import org.insa.graph.Node;
+import org.insa.graph.Path;
+
 public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
+	Map<Node,Label> map=new HashMap<>();
+    List<Node> nodesDone=new ArrayList<Node>();
+    List<Node> nodesUndone=new ArrayList<Node>();
+    
     public DijkstraAlgorithm(ShortestPathData data) {
         super(data);
     }
-
+    //find the node with the lowest distance in nodesUndone and return it
+    private Node getNodeWithLowestDistance(){
+    	double lowest_cost=Double.MAX_VALUE;
+    	double aux;
+    	Node lowest = null;
+    	for(Node i:nodesUndone) {
+    		if((aux=map.get(i).getCost())<lowest_cost) {
+    			lowest=i;
+    			lowest_cost=aux;
+    		}
+    	}
+		return lowest;    
+    }
+    //ajoute les voisins à la liste des noeuds à évaluer + met à jour les étiquettes
+    private void evaluatedNeighbors(Node evaluationNode){
+    	double distance,newDistance;
+    	for(Arc i:evaluationNode.getSuccessors()) {
+    		if(!nodesDone.contains(i.getDestination())) {
+    			distance=i.getLength();
+    			newDistance=map.get(evaluationNode).getCost()+distance;
+    			if(map.get(i.getDestination()).getCost() > newDistance) {
+    				map.get(i.getDestination()).setCost(newDistance);
+    				nodesUndone.add(i.getDestination());
+    			}
+    		}
+    	}
+       /*
+        * 
+        *  Foreach destinationNode which can be reached via an edge from evaluationNode AND which is not in SettledNodes {
+            edgeDistance = getDistance(edge(evaluationNode, destinationNode))
+            newDistance = distance[evaluationNode] + edgeDistance
+            if (distance[destinationNode]  > newDistance ) {
+                distance[destinationNode]  = newDistance
+                add destinationNode to UnSettledNodes
+            }
+        }*/
+    }
+    
     @Override
     protected ShortestPathSolution doRun() {
         ShortestPathData data = getInputData();
-        ShortestPathSolution solution = null;
+        List<Arc> arcsSolution=new ArrayList<Arc>();
+        Graph graph=data.getGraph();
+        List<Arc> arcs=data.getOrigin().getSuccessors();
+        Node evaluation;
+        //initialisation des étiquettes
+        map.put(data.getOrigin(),new Label(data.getOrigin(),false,Double.MAX_VALUE,data.getOrigin()));
+        
+        //TODO: init_etiquette: récursif et fait la boucle ne dessous pour tous les nodes
+      // init_etiquettes();
+       for(Arc i: arcs) {
+       	map.put(i.getDestination(),new Label(i.getDestination(),false,Double.MAX_VALUE,i.getOrigin()));
+       	//labels.add(new Label(i.getDestination(),false,Double.MAX_VALUE,i.getOrigin()));
+       }
+        
+        nodesUndone.add(data.getOrigin());
+        //le node origine a un cout nul
+        map.get(data.getOrigin()).setCost(0);
+        //labels.get(labels.indexOf(nodesUndone)).setCost(0);
+        while(!nodesUndone.isEmpty()) {
+        	evaluation =getNodeWithLowestDistance();
+        	nodesUndone.remove(evaluation);
+        	nodesDone.add(evaluation);
+        	evaluatedNeighbors(evaluation);
+        }
         /*
          * 
          * 
@@ -29,9 +104,7 @@ while (UnSettledNodes is not empty) {
     evaluatedNeighbors(evaluationNode)
 }
 
-getNodeWithLowestDistance(UnSettledNodes){
-    find the node with the lowest distance in UnSettledNodes and return it
-}
+
 
 evaluatedNeighbors(evaluationNode){
     Foreach destinationNode which can be reached via an edge from evaluationNode AND which is not in SettledNodes {
@@ -44,12 +117,22 @@ evaluatedNeighbors(evaluationNode){
     }
 }
          */
+        //création du chemin solution
+        //à partir des étiquettes placées (à rebours)
+        //TODO: à finir
+        Node aux = data.getDestination();
+        double total_distance=0;//pour nous
+        while(aux!=data.getOrigin()) {
+        	map.get(aux).getFather();
+        	total_distance+=map.get(aux).getCost();
+        	//recuperer l'arc et l'ajouter à la liste des arcs solutions
+        }
         
         
         
         
-        // TODO:
-        return solution;
+		// TODO: modifier le status selon le résultat
+        return new ShortestPathSolution(data, Status.FEASIBLE, new Path(graph,arcsSolution));
     }
 
 }

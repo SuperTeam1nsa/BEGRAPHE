@@ -22,7 +22,7 @@ public Label(Node sommet, boolean mark, double cost,Node father)
 public boolean getMarque() {return marque;}
 public void setMarque(boolean value) {marque=value;}
 public void setCost(double cost) {cout=cost;}
-
+public Node getFather() {return pere;}
 
 double getCost()
 {
