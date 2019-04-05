@@ -141,10 +141,48 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
         this.arraySet(index, x);
         this.percolateUp(index);
     }
+   /* 
+    private void move_down(int indexElt, BinaryHeap h) {
+    	boolean Continue = True;
+    	int i = indexElt;
+    	
+    	while (Continue) {
+    		if()
+    	}
+    }*/
 
     @Override
     public void remove(E x) throws ElementNotFoundException {
-        // TODO:
+    	int indexElt;
+    	int indexParent;
+        
+    	if(this.isEmpty()){
+    		throw new ElementNotFoundException(x);
+    	}
+  
+    	indexElt = this.array.indexOf(x);
+        if(indexElt == -1 || indexElt >= currentSize) {
+        	throw new ElementNotFoundException(x);
+        }
+        
+
+        this.array.set(indexElt, this.array.get(--this.currentSize));
+        
+        //if(indexElt /)
+        indexParent = indexElt/2;
+        //if(indexElt == 0 || this.array.get(indexElt).compareTo(this.array.get(indexParent)) >=0) {
+        	this.percolateDown(indexElt);
+        //}
+       // else{
+        	this.percolateUp(indexElt);
+        //} 
+        /*
+        if(indexElt != 0 && this.array.get(indexElt).compareTo(this.array.get(indexParent)) < 0) {
+        	this.percolateUp(indexElt);
+        }
+        else{
+        	this.percolateDown(indexElt);
+        }     */
     }
 
     @Override
@@ -156,10 +194,12 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
 
     @Override
     public E deleteMin() throws EmptyPriorityQueueException {
+    	
         E minItem = findMin();
         E lastItem = this.array.get(--this.currentSize);
         this.arraySet(0, lastItem);
         this.percolateDown(0);
+        
         return minItem;
     }
 

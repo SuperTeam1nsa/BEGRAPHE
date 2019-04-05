@@ -275,8 +275,11 @@ public abstract class PriorityQueueTest {
     @Test
     public void testRemove() {
         int size1 = queue.size();
+        System.out.println(queue);
         for (int i = 0; i < parameters.deleteOrder.length; ++i) {
             // Remove from structure
+        	System.out.println("Want to remove " + i + "(" + parameters.deleteOrder.length + ")\n");
+        	
             queue.remove(parameters.data[parameters.deleteOrder[i]]);
 
             // Copy the remaining elements
@@ -290,8 +293,9 @@ public abstract class PriorityQueueTest {
                 remains_cp.add(copyTree.deleteMin());
             }
 
-            Collections.sort(remains_in);
-
+           Collections.sort(remains_in);
+           System.out.println(remains_in);
+           System.out.println(remains_cp);
             // Check that the copy is now empty, and that both list contains all
             // elements.
             assertTrue(copyTree.isEmpty());
