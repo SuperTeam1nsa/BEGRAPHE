@@ -1,6 +1,7 @@
 package org.insa.algo.shortestpath;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,10 +14,10 @@ import org.insa.graph.Path;
 
 public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
-	Map<Node,Label> map=new HashMap<>();
-    List<Node> nodesDone=new ArrayList<Node>();
-    List<Node> nodesUndone=new ArrayList<Node>();
-    
+	private Map<Node,Label> map=new HashMap<>();
+	private List<Node> nodesDone=new ArrayList<Node>();
+	private List<Node> nodesUndone=new ArrayList<Node>();
+	private ShortestPathData data;
     public DijkstraAlgorithm(ShortestPathData data) {
         super(data);
     }
@@ -57,22 +58,26 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             }
         }*/
     }
+    private void init_etiquette(Node n) {
+    	if(n != data.getDestination())
+              for(Arc i: n.getSuccessors()) {
+           	map.put(i.getDestination(),new Label(i.getDestination(),false,Double.MAX_VALUE,i.getOrigin()));
+           	init_etiquette(i.getDestination());
+           }
+    }
     
     @Override
     protected ShortestPathSolution doRun() {
-        ShortestPathData data = getInputData();
+       data = getInputData();
         List<Arc> arcsSolution=new ArrayList<Arc>();
         Graph graph=data.getGraph();
-        List<Arc> arcs=data.getOrigin().getSuccessors();
         Node evaluation;
-        //initialisation des étiquettes
+      //initialisation 1ère etiquette
         map.put(data.getOrigin(),new Label(data.getOrigin(),false,Double.MAX_VALUE,data.getOrigin()));
         
-        //TODO: init_etiquette: récursif et fait la boucle ne dessous pour tous les nodes
-      // init_etiquettes();
-       for(Arc i: arcs) {
-       	map.put(i.getDestination(),new Label(i.getDestination(),false,Double.MAX_VALUE,i.getOrigin()));
-       	//labels.add(new Label(i.getDestination(),false,Double.MAX_VALUE,i.getOrigin()));
+        // init_etiquette: récursif et fait la boucle pour tous les nodes
+       for(Arc i: data.getOrigin().getSuccessors()) {
+       init_etiquette(i.getDestination());
        }
         
         nodesUndone.add(data.getOrigin());
@@ -119,16 +124,25 @@ evaluatedNeighbors(evaluationNode){
          */
         //création du chemin solution
         //à partir des étiquettes placées (à rebours)
-        //TODO: à finir
-        Node aux = data.getDestination();
+        Node fils = data.getDestination();
+        Node pere;
         double total_distance=0;//pour nous
-        while(aux!=data.getOrigin()) {
-        	map.get(aux).getFather();
-        	total_distance+=map.get(aux).getCost();
+        while(fils!=data.getOrigin()) {
+        	total_distance+=map.get(fils).getCost();
+        	pere=map.get(fils).getFather();
         	//recuperer l'arc et l'ajouter à la liste des arcs solutions
+        	for(Arc i:pere.getSuccessors()) {
+        		if(i.getDestination()==fils) {
+        			arcsSolution.add(i);
+        			break;
+        		}
+        	}
+        	fils=pere;
         }
+        //on remet les arcs dans le bon sens:
+        Collections.reverse(arcsSolution);
         
-        
+        System.out.print("distance totale :"+total_distance);
         
         
 		// TODO: modifier le status selon le résultat
