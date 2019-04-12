@@ -2,11 +2,10 @@ package org.insa.algo.shortestpath;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.insa.algo.AbstractSolution.Status;
+import org.insa.algo.utils.BinaryHeap;
+import org.insa.algo.utils.ElementNotFoundException;
 import org.insa.graph.Arc;
 import org.insa.graph.Graph;
 import org.insa.graph.Node;
@@ -14,13 +13,16 @@ import org.insa.graph.Path;
 
 public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
+	/*
 	private Map<Node,Label> map=new HashMap<>();
 	private List<Node> nodesDone=new ArrayList<Node>();
 	private List<Node> nodesUndone=new ArrayList<Node>();
-	private ShortestPathData data;
+	private ShortestPathData data;*/
     public DijkstraAlgorithm(ShortestPathData data) {
         super(data);
     }
+    
+    /*
     //find the node with the lowest distance in nodesUndone and return it
     private Node getNodeWithLowestDistance(){
     	double lowest_cost=Double.MAX_VALUE;
@@ -34,7 +36,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
     	}
 		return lowest;    
     }
-    //ajoute les voisins à la liste des noeuds à évaluer + met à jour les étiquettes
+    //ajoute les voisins ï¿½ la liste des noeuds ï¿½ ï¿½valuer + met ï¿½ jour les ï¿½tiquettes
     private void evaluatedNeighbors(Node evaluationNode){
     	double distance,newDistance;
     	for(Arc i:evaluationNode.getSuccessors()) {
@@ -47,7 +49,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
     			}
     		}
     	}
-       /*
+   
         * 
         *  Foreach destinationNode which can be reached via an edge from evaluationNode AND which is not in SettledNodes {
             edgeDistance = getDistance(edge(evaluationNode, destinationNode))
@@ -56,7 +58,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                 distance[destinationNode]  = newDistance
                 add destinationNode to UnSettledNodes
             }
-        }*/
+        }
     }
     private void init_etiquette(Node n) {
     	if(n != data.getDestination())
@@ -64,33 +66,121 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
            	map.put(i.getDestination(),new Label(i.getDestination(),false,Double.MAX_VALUE,i.getOrigin()));
            	init_etiquette(i.getDestination());
            }
-    }
+    }*/
     
     @Override
     protected ShortestPathSolution doRun() {
-       data = getInputData();
-        List<Arc> arcsSolution=new ArrayList<Arc>();
-        Graph graph=data.getGraph();
-        Node evaluation;
-      //initialisation 1ère etiquette
-        map.put(data.getOrigin(),new Label(data.getOrigin(),false,Double.MAX_VALUE,data.getOrigin()));
+    	
+    	// Retrieve the graph.
+        ShortestPathData data = getInputData();
+        Graph graph = data.getGraph();
+
+        final int nbNodes = graph.size();
+
+        // Initialize array of distances.
+        Label[] map = new Label[nbNodes];
+        int j=0;
+        for(Node n:graph.getNodes()) {
+        	map[j]=new Label(n);
+        	j++;
+        }
+        map[data.getOrigin().getId()].setCost(0);
+        // Notify observers about the first event (origin processed).
+        notifyOriginProcessed(data.getOrigin());
+
+        // Initialize array of predecessors.
+        Arc[] predecessorArcs = new Arc[nbNodes];
+
+        BinaryHeap<Label> tas=new BinaryHeap<Label>();
+        //on insÃ¨re le 1er Ã©lÃ©ment
+        tas.insert(map[0]);
+        int i=-1;
+        //tant qu'on n'a pas marquÃ© tous les nodes
+        Label eval;
+        Label suiv;
+        while(i<nbNodes) {
+        	i++;
+        	eval=tas.findMin();
+        	//check si eval est le mÃªme dans le tas et map
+        	eval.setMarque(true);
+        	for(Arc a:eval.getOrigin().getSuccessors()) {
+        		// Small test to check allowed roads...
+                if (!data.isAllowed(a)) {
+                    continue;
+                }
+        		suiv=map[a.getDestination().getId()];
+        		
+        		if(!suiv.getMarque()) {
+        			/*oldCost=suiv.getCost();
+        			suiv.setCost(Double.min(suiv.getCost(), eval.getCost()+a.getLength()));
+        			if(oldCost !=suiv.getCost()) {
+        				tas.insert(suiv);
+        				
+        				suiv.setFather(eval.getOrigin());
+        			}
+        			*/
+                    // Retrieve weight of the arc.
+                    double w = data.getCost(a);
+                    double oldDistance =suiv.getCost();
+                    double newDistance = eval.getCost() + w;
+
+                    if (Double.isInfinite(oldDistance) && Double.isFinite(newDistance)) {
+                        notifyNodeReached(a.getDestination());
+                    }
+        			if(oldDistance>newDistance) {
+        				suiv.setCost(newDistance);
+        				try {
+							tas.remove(suiv);
+						} catch (ElementNotFoundException e) {
+							//e.printStackTrace();
+						}
+        				tas.insert(suiv);
+        				predecessorArcs[a.getDestination().getId()] = a;
+        			}
+        		}
+        		
+        	}
+        }
+        ShortestPathSolution solution = null;
         
-        // init_etiquette: récursif et fait la boucle pour tous les nodes
-       for(Arc i: data.getOrigin().getSuccessors()) {
-       init_etiquette(i.getDestination());
-       }
         
-        nodesUndone.add(data.getOrigin());
-        //le node origine a un cout nul
-        map.get(data.getOrigin()).setCost(0);
-        //labels.get(labels.indexOf(nodesUndone)).setCost(0);
-        while(!nodesUndone.isEmpty()) {
+
+        // Destination has no predecessor, the solution is infeasible...
+        if (predecessorArcs[data.getDestination().getId()] == null) {
+            solution = new ShortestPathSolution(data, Status.INFEASIBLE);
+        }
+        else {
+
+            // The destination has been found, notify the observers.
+            notifyDestinationReached(data.getDestination());
+
+            // Create the path from the array of predecessors...
+            ArrayList<Arc> arcs = new ArrayList<>();
+            Arc arc = predecessorArcs[data.getDestination().getId()];
+            while (arc != null) {
+                arcs.add(arc);
+                arc = predecessorArcs[arc.getOrigin().getId()];
+            }
+
+            // Reverse the path...
+            Collections.reverse(arcs);
+
+            // Create the final solution.
+            solution = new ShortestPathSolution(data, Status.OPTIMAL, new Path(graph, arcs));
+        }
+
+        return solution;
+    }
+
+}
+           
+        /*while(!nodesUndone.isEmpty()) {
         	evaluation =getNodeWithLowestDistance();
         	nodesUndone.remove(evaluation);
         	nodesDone.add(evaluation);
         	evaluatedNeighbors(evaluation);
         }
-        /*
+        
          * 
          * 
          * 
@@ -122,15 +212,17 @@ evaluatedNeighbors(evaluationNode){
     }
 }
          */
-        //création du chemin solution
-        //à partir des étiquettes placées (à rebours)
+        //crï¿½ation du chemin solution
+        //ï¿½ partir des ï¿½tiquettes placï¿½es (ï¿½ rebours)
+        /*
         Node fils = data.getDestination();
         Node pere;
         double total_distance=0;//pour nous
         while(fils!=data.getOrigin()) {
         	total_distance+=map.get(fils).getCost();
         	pere=map.get(fils).getFather();
-        	//recuperer l'arc et l'ajouter à la liste des arcs solutions
+        	//recuperer l'arc et l'ajouter ï¿½ la liste des arcs solutions
+        	//utiliser fastest
         	for(Arc i:pere.getSuccessors()) {
         		if(i.getDestination()==fils) {
         			arcsSolution.add(i);
@@ -139,15 +231,15 @@ evaluatedNeighbors(evaluationNode){
         	}
         	fils=pere;
         }
+        
         //on remet les arcs dans le bon sens:
         Collections.reverse(arcsSolution);
         
         System.out.print("distance totale :"+total_distance);
         
         
-		// TODO: modifier le status selon le résultat
+		//  modifier le status selon le rï¿½sultat
         return new ShortestPathSolution(data, Status.FEASIBLE, new Path(graph,arcsSolution));
-    }
+        */
 
-}
 
