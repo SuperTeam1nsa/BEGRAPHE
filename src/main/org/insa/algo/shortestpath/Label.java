@@ -23,10 +23,13 @@ public Label(Node current)
 }
 public boolean getMarque() {return marque;}
 public void setMarque(boolean value) {marque=value;}
+
 public void setCost(double cost) {cout=cost;}
+
 public void setFather(Node p) { pere=p;}
 public Node getFather() {return pere;}
-public Node getOrigin() {return sommet_courant;}
+
+public Node getNode() {return sommet_courant;}
 double getCost()
 {
 	return this.cout;

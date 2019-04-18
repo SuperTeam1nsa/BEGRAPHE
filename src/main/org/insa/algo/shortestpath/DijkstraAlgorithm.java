@@ -13,60 +13,11 @@ import org.insa.graph.Path;
 
 public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
-	/*
-	private Map<Node,Label> map=new HashMap<>();
-	private List<Node> nodesDone=new ArrayList<Node>();
-	private List<Node> nodesUndone=new ArrayList<Node>();
-	private ShortestPathData data;*/
+
     public DijkstraAlgorithm(ShortestPathData data) {
         super(data);
     }
     
-    /*
-    //find the node with the lowest distance in nodesUndone and return it
-    private Node getNodeWithLowestDistance(){
-    	double lowest_cost=Double.MAX_VALUE;
-    	double aux;
-    	Node lowest = null;
-    	for(Node i:nodesUndone) {
-    		if((aux=map.get(i).getCost())<lowest_cost) {
-    			lowest=i;
-    			lowest_cost=aux;
-    		}
-    	}
-		return lowest;    
-    }
-    //ajoute les voisins � la liste des noeuds � �valuer + met � jour les �tiquettes
-    private void evaluatedNeighbors(Node evaluationNode){
-    	double distance,newDistance;
-    	for(Arc i:evaluationNode.getSuccessors()) {
-    		if(!nodesDone.contains(i.getDestination())) {
-    			distance=i.getLength();
-    			newDistance=map.get(evaluationNode).getCost()+distance;
-    			if(map.get(i.getDestination()).getCost() > newDistance) {
-    				map.get(i.getDestination()).setCost(newDistance);
-    				nodesUndone.add(i.getDestination());
-    			}
-    		}
-    	}
-   
-        * 
-        *  Foreach destinationNode which can be reached via an edge from evaluationNode AND which is not in SettledNodes {
-            edgeDistance = getDistance(edge(evaluationNode, destinationNode))
-            newDistance = distance[evaluationNode] + edgeDistance
-            if (distance[destinationNode]  > newDistance ) {
-                distance[destinationNode]  = newDistance
-                add destinationNode to UnSettledNodes
-            }
-        }
-    }
-    private void init_etiquette(Node n) {
-    	if(n != data.getDestination())
-              for(Arc i: n.getSuccessors()) {
-           	map.put(i.getDestination(),new Label(i.getDestination(),false,Double.MAX_VALUE,i.getOrigin()));
-           	init_etiquette(i.getDestination());
-           }
-    }*/
     
     @Override
     protected ShortestPathSolution doRun() {
@@ -77,80 +28,112 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
         final int nbNodes = graph.size();
 
-        // Initialize array of distances.
+        // Initialisation du tableau des Labels
         Label[] map = new Label[nbNodes];
-        int j=0;
+        
+        //Remplissage du tableau des labels
         for(Node n:graph.getNodes()) {
-        	map[j]=new Label(n);
-        	j++;
+        	map[n.getId()]=new Label(n);
         }
+        
+        //Initialisation du coût du noeud initial à 0
         map[data.getOrigin().getId()].setCost(0);
+        
         // Notify observers about the first event (origin processed).
         notifyOriginProcessed(data.getOrigin());
 
-        // Initialize array of predecessors.
+        // Initialisation du tableau des arcs contenant les predecesseurs
         Arc[] predecessorArcs = new Arc[nbNodes];
 
         BinaryHeap<Label> tas=new BinaryHeap<Label>();
+        
         //on insère le 1er élément
-        tas.insert(map[0]);
+        tas.insert(map[data.getOrigin().getId()]);
+        
+        System.out.println("Il ya " + nbNodes + " nodes dans le graph");
+        
         int i=-1;
-        //tant qu'on n'a pas marqué tous les nodes
-        Label eval;
-        Label suiv;
-        while(i<nbNodes) {
+        Label labelCurrentNode; // Le label du noeud qu'on evalue à un instant de la boucle while
+        Label labelNextNode; // L'un des successeur de currentNode
+        //boolean stillContinue = true;
+        while( i<nbNodes ) {
         	i++;
-        	eval=tas.findMin();
-        	//check si eval est le même dans le tas et map
-        	eval.setMarque(true);
-        	for(Arc a:eval.getOrigin().getSuccessors()) {
+        	
+        	//Extract the current Label 
+        	labelCurrentNode=tas.deleteMin();
+        	System.out.println("\ncurrentEvaluatingNode("+ labelCurrentNode.getNode().getId() + "), Cost("+ labelCurrentNode.getCost()+")\niteration=(" + i +")");
+        	
+        	labelCurrentNode.setMarque(true);
+        	for(Arc a : labelCurrentNode.getNode().getSuccessors()) {
         		// Small test to check allowed roads...
-                if (!data.isAllowed(a)) {
-                    continue;
-                }
-        		suiv=map[a.getDestination().getId()];
+                if (data.isAllowed(a)) {
+                	//labelNextNode.set = a.getDestination();
+	        		labelNextNode=map[a.getDestination().getId()];
+	        		//labelNextNode.setCost( data.getCost(a));
+	        		
+	        		if(!labelNextNode.getMarque()) {
+	        			/*oldCost=suiv.getCost();
+	        			suiv.setCost(Double.min(suiv.getCost(), eval.getCost()+a.getLength()));
+	        			if(oldCost !=suiv.getCost()) {
+	        				tas.insert(suiv);
+	        				
+	        				suiv.setFather(eval.getOrigin());
+	        			}
+	        			*/
+	                    // Retrieve weight of the arc.
+	                    //double w = labelNextNode.getCost();
+	        			double currentCost = data.getCost(a);
+	        			double oldDistance = labelNextNode.getCost(); //ATTENTION
+	                    double newDistance = labelCurrentNode.getCost() + currentCost;
+	                    
+	                    //System.out.println("Node num " + a.getDestination().getId() + " touché !");
+        				//System.out.println("from Node num " + a.getOrigin().getId()  + " touché !");
+	                    System.out.println("--> Node(" + a.getDestination().getId() + ") : <AnciantCost(" + oldDistance + ") --> NewCost(" + newDistance +")>"  );
+	                    if (Double.isInfinite(oldDistance) && Double.isFinite(newDistance)) {
+	                        notifyNodeReached(a.getDestination());
+	                    }
+	                    
+	        			if(oldDistance>newDistance) {
+	        				labelNextNode.setCost(newDistance);
+	        				labelNextNode.setFather(a.getOrigin());
+	        				
+	        				try {
+								tas.remove(labelNextNode);
+							} 
+	        				catch (ElementNotFoundException e) {
+								//e.printStackTrace();
+							}
+	        				finally {
+	        					tas.insert(labelNextNode);
+	        				}
+	        				
+	        				predecessorArcs[a.getDestination().getId()] = a;
+	        				//predecessorArcs[a.getOrigin().getId()] = a;
+	        				
+	        			}
+	        		}
         		
-        		if(!suiv.getMarque()) {
-        			/*oldCost=suiv.getCost();
-        			suiv.setCost(Double.min(suiv.getCost(), eval.getCost()+a.getLength()));
-        			if(oldCost !=suiv.getCost()) {
-        				tas.insert(suiv);
-        				
-        				suiv.setFather(eval.getOrigin());
-        			}
-        			*/
-                    // Retrieve weight of the arc.
-                    double w = data.getCost(a);
-                    double oldDistance =suiv.getCost();
-                    double newDistance = eval.getCost() + w;
-
-                    if (Double.isInfinite(oldDistance) && Double.isFinite(newDistance)) {
-                        notifyNodeReached(a.getDestination());
-                    }
-        			if(oldDistance>newDistance) {
-        				suiv.setCost(newDistance);
-        				try {
-							tas.remove(suiv);
-						} catch (ElementNotFoundException e) {
-							//e.printStackTrace();
-						}
-        				tas.insert(suiv);
-        				predecessorArcs[a.getDestination().getId()] = a;
-        			}
-        		}
+                }
         		
         	}
         }
         ShortestPathSolution solution = null;
         
-        
+        for(int i1=0; i1<nbNodes; i1++)
+        {
+        	double idNodeOrigin = predecessorArcs[i1].getOrigin().getId();
+            double idNodeDest = predecessorArcs[i1].getDestination().getId();
+            double coutArc = data.getCost(predecessorArcs[i1]);
+            
+        	System.out.println("Node " + idNodeOrigin + " < Node(" + idNodeDest + "), Cost(" + coutArc + ")>");
+        }
 
         // Destination has no predecessor, the solution is infeasible...
         if (predecessorArcs[data.getDestination().getId()] == null) {
             solution = new ShortestPathSolution(data, Status.INFEASIBLE);
         }
         else {
-
+        	System.out.println("I found the solution ");
             // The destination has been found, notify the observers.
             notifyDestinationReached(data.getDestination());
 
