@@ -54,7 +54,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         Label labelCurrentNode; // Le label du noeud qu'on evalue à un instant de la boucle while
         Label labelNextNode; // L'un des successeur de currentNode
         //boolean stillContinue = true;
-        while( ! tas.isEmpty() ) {
+       do {
 
         	//Extract the current Label 
         	labelCurrentNode=tas.deleteMin();        	
@@ -63,11 +63,14 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         		// Small test to check allowed roads...
                 if (data.isAllowed(a)) {
                 	//labelNextNode.set = a.getDestination(); //Remplir la destination ou bien virer de la Claass car ne sert à rien
-	        		labelNextNode=map[a.getDestination().getId()];
-	        		
+	        		//labelNextNode=map[a.getDestination().getId()];
+                	labelNextNode=map[a.getDestination().getId()];
+                	
+                	
 	        		if(!labelNextNode.getMarque()) {
 	        			
-	        			double currentCost = data.getCost(a);
+	        			double currentCost = data.getCost(a); // Complexité ?
+	        			//double currentCost = a.getLength();
 	        			double oldDistance = labelNextNode.getCost(); //ATTENTION
 	                    double newDistance = labelCurrentNode.getCost() + currentCost;
 	                    
@@ -89,6 +92,15 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 	        					tas.insert(labelNextNode);
 	        				}
 	        				
+	        				/*if(labelNextNode.getCost() == Double.POSITIVE_INFINITY) {
+	        					tas.insert(labelNextNode);
+	        				}
+	        				else
+	        				{	
+	        					tas.remove(labelNextNode);
+	        					tas.insert(labelNextNode);
+	        				}*/
+	        				
 	        				predecessorArcs[a.getDestination().getId()] = a;
 	        				
 	        			}
@@ -97,7 +109,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                 }
         		
         	}
-        }
+        } while( !tas.isEmpty() && labelCurrentNode.getNode().getId()!=data.getDestination().getId());
         ShortestPathSolution solution = null;
 
         // Destination has no predecessor, the solution is infeasible...
@@ -111,8 +123,9 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             // Create the path from the array of predecessors...
             ArrayList<Arc> arcs = new ArrayList<>();
             Arc arc = predecessorArcs[data.getDestination().getId()];
-            while (arc != null && arc.getDestination() != data.getOrigin()) {
-                arcs.add(arc);
+            //while (arc != null && arc.getDestination() != data.getOrigin()) {
+            while ( arc != null ) {
+            	arcs.add(arc);
                 arc = predecessorArcs[arc.getOrigin().getId()];
             }
 
