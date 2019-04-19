@@ -56,7 +56,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         Label labelCurrentNode; // Le label du noeud qu'on evalue à un instant de la boucle while
         Label labelNextNode; // L'un des successeur de currentNode
         //boolean stillContinue = true;
-        while( i<nbNodes ) {
+        while( ! tas.isEmpty() ) {
         	i++;
         	
         	//Extract the current Label 
@@ -119,14 +119,14 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         }
         ShortestPathSolution solution = null;
         
-        for(int i1=0; i1<nbNodes; i1++)
+        /*for(int i1=0; i1<nbNodes; i1++)
         {
         	double idNodeOrigin = predecessorArcs[i1].getOrigin().getId();
             double idNodeDest = predecessorArcs[i1].getDestination().getId();
             double coutArc = data.getCost(predecessorArcs[i1]);
             
-        	System.out.println("Node " + idNodeOrigin + " < Node(" + idNodeDest + "), Cost(" + coutArc + ")>");
-        }
+        	System.out.println("Node " + idNodeOrigin + " < Node(" + idNodeDest + "), Cost(" + coutArc + ")> iteration("  + i1 + ")");
+        }*/
 
         // Destination has no predecessor, the solution is infeasible...
         if (predecessorArcs[data.getDestination().getId()] == null) {
@@ -140,7 +140,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             // Create the path from the array of predecessors...
             ArrayList<Arc> arcs = new ArrayList<>();
             Arc arc = predecessorArcs[data.getDestination().getId()];
-            while (arc != null) {
+            while (arc != null && arc.getDestination() != data.getOrigin()) {
                 arcs.add(arc);
                 arc = predecessorArcs[arc.getOrigin().getId()];
             }
