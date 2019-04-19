@@ -168,23 +168,19 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
         }
         
 
-        this.arraySet(indexElt, this.array.get(--this.currentSize));
-        
-        //if(indexElt /)
-        //indexParent = indexElt/2;
-        //if(indexElt == 0 || this.array.get(indexElt).compareTo(this.array.get(indexParent)) >=0) {
-        	this.percolateDown(indexElt);
-        //}
-       // else{
-        	this.percolateUp(indexElt);
-        //} 
         /*
-        if(indexElt != 0 && this.array.get(indexElt).compareTo(this.array.get(indexParent)) < 0) {
-        	this.percolateUp(indexElt);
-        }
-        else{
+          this.arraySet(indexElt, this.array.get(--this.currentSize));
         	this.percolateDown(indexElt);
-        }     */
+        	this.percolateUp(indexElt);
+        */
+        
+        E min = this.deleteMin();
+        this.arraySet(indexElt, min);
+        this.percolateUp(indexElt);
+        
+        
+        	
+         
     }
 
     @Override
