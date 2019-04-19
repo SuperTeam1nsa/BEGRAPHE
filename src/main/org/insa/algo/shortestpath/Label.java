@@ -42,7 +42,7 @@ public String toString() {
 	}
 @Override
 public int compareTo(Label o) {
-	return (int) (this.cout-o.getCost());
+	return this.cout-o.getCost()>0?1:this.cout==o.getCost()?0:-1;
 }
 
 }

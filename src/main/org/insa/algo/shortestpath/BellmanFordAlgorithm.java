@@ -77,7 +77,7 @@ public class BellmanFordAlgorithm extends ShortestPathAlgorithm {
         else {
 
             // The destination has been found, notify the observers.
-            notifyDestinationReached(data.getDestination());
+	        notifyDestinationReached(data.getDestination());
 
             // Create the path from the array of predecessors...
             ArrayList<Arc> arcs = new ArrayList<>();
