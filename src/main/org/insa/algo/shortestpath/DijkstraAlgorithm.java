@@ -69,7 +69,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                 	
 	        		if(!labelNextNode.getMarque()) {
 	        			
-	        			double currentCost = data.getCost(a); // Complexité ?
+	        			double currentCost = data.getCost(a); //need
 	        			//double currentCost = a.getLength();
 	        			double oldDistance = labelNextNode.getCost(); //ATTENTION
 	                    double newDistance = labelCurrentNode.getCost() + currentCost;
@@ -79,10 +79,11 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 	                    }
 	                    
 	        			if(oldDistance>newDistance) {
+	        				//getters/setters out to enhance performance
 	        				labelNextNode.setCost(newDistance);
-	        				labelNextNode.setFather(a.getOrigin());
+	        				//labelNextNode.setFather(a.getOrigin());
 	        				
-	        				try {
+	        				/*try {
 								tas.remove(labelNextNode);
 							} 
 	        				catch (ElementNotFoundException e) {
@@ -90,16 +91,21 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 							}
 	        				finally {
 	        					tas.insert(labelNextNode);
-	        				}
+	        				}*/
 	        				
-	        				/*if(labelNextNode.getCost() == Double.POSITIVE_INFINITY) {
+	        				if(Double.isInfinite(oldDistance)) {
 	        					tas.insert(labelNextNode);
 	        				}
 	        				else
 	        				{	
-	        					tas.remove(labelNextNode);
+	        					try {
+									tas.remove(labelNextNode);
+								} 
+		        				catch (ElementNotFoundException e) {
+		        					
+								}
 	        					tas.insert(labelNextNode);
-	        				}*/
+	        				}
 	        				
 	        				predecessorArcs[a.getDestination().getId()] = a;
 	        				

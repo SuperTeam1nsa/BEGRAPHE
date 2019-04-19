@@ -173,7 +173,6 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
         	this.percolateDown(indexElt);
         	this.percolateUp(indexElt);
         */
-        
         E min = this.deleteMin();
         this.arraySet(indexElt, min);
         this.percolateUp(indexElt);
