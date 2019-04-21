@@ -10,6 +10,7 @@
 package org.insa.algo.utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Implements a binary heap. Note that all "matching" is based on the compareTo
@@ -18,20 +19,22 @@ import java.util.ArrayList;
  * @author Mark Allen Weiss
  * @author DLB
  */
-public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
+public class BinaryHeap<E extends Comparable<E> > implements PriorityQueue<E> {
 
     // Number of elements in heap.
     private int currentSize;
 
     // The heap array.
     private final ArrayList<E> array;
-
+    
+    private HashMap<E,Integer> indirection;
     /**
      * Construct a new empty binary heap.
      */
     public BinaryHeap() {
         this.currentSize = 0;
         this.array = new ArrayList<E>();
+        indirection=new HashMap<E,Integer>();
     }
 
     /**
@@ -42,6 +45,7 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
     public BinaryHeap(BinaryHeap<E> heap) {
         this.currentSize = heap.currentSize;
         this.array = new ArrayList<E>(heap.array);
+        indirection= new HashMap<E,Integer>(heap.indirection);
     }
 
     /**
@@ -51,6 +55,7 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
      * @param value Element to set.
      */
     private void arraySet(int index, E value) {
+        indirection.put(value, index);
         if (index == this.array.size()) {
             this.array.add(value);
         }
@@ -156,12 +161,17 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
     	int indexElt;
     	//int indexParent;
         
+    	
     	if(this.isEmpty()){
     		throw new ElementNotFoundException(x);
     	}
   
-    	indexElt = this.array.indexOf(x);
-    	
+    	//indexElt = this.array.indexOf(x);
+    	//en O(1) HashMap hors hash collision (avec id qui est != pour chaque node il n'y est pas censé y en avoir
+    	indexElt=indirection.get(x);
+    	/*Rq pour Abdel :
+    	 * Une table de hachage est une implémentation particulière d'un tableau associatif. Elle est aussi la plus courante. Basiquement il s'agit d'un tableau dont les cases contiennent un pointeur vers nil, un élément ou une liste d'élément. On détermine la case à utiliser en appliquant une fonction de hachage à la clé. Idéalement, chaque case ne pointera que vers un unique élément. Dans ce cas les opérations d'insertion, de consultation et de suppression se font en temps constant, noté O(1), c'est à dire qui ne dépend pas du nombre d'éléments présents dans la table de hachage. Cependant si la fonction de hachage retourne deux fois la même valeur pour deux clés différentes, ce que l'on nomme collision, alors les deux valeurs sont généralement stockées comme une liste. C'est à dire que maintenant il va falloir parcourir toute cette liste. Dans le pire cas, la fonction de hachage retourne toujours la même valeur, toutes les valeurs vont donc être stockées dans la même case et l'on va devoir parcourir la liste pour chaque opération. La complexité est alors linéaire par rapport au nombre d'éléments dans la structure, noté O(n), ce qui est très peu performant. Une table de hachage a donc une complexité moyenne d'O(1) mais un pire cas en O(n). Il est donc crucial d'avoir une fonction de hachage performante. Les personnes n'étant pas à l'aise avec l'implémentation d'une table de hachage ou les concepts précédant auront tout intérêt à consulter la page Wikipédia qui est assez complète.
+    	 */
     	
         if(indexElt == -1 || indexElt >= currentSize) {
         	throw new ElementNotFoundException(x);
@@ -176,9 +186,6 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
         E min = this.deleteMin();
         this.arraySet(indexElt, min);
         this.percolateUp(indexElt);
-        
-        
-        	
          
     }
 

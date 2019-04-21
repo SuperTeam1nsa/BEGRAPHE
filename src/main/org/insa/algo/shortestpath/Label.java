@@ -7,7 +7,7 @@ import org.insa.graph.*;
 public class Label implements Comparable<Label> {
 
 	private 
-	Node sommet_courant ;
+	Node sommetCourant ;
 	boolean marque; 
 	double cout; 
 	Node pere; 
@@ -18,7 +18,7 @@ public Label(Node current)
 	marque=false;
 	cout=Double.POSITIVE_INFINITY;
 	pere=null;
-	sommet_courant=current;
+	sommetCourant=current;
 	
 }
 public boolean getMarque() {return marque;}
@@ -29,15 +29,18 @@ public void setCost(double cost) {cout=cost;}
 public void setFather(Node p) { pere=p;}
 public Node getFather() {return pere;}
 
-public Node getNode() {return sommet_courant;}
+public Node getNode() {return sommetCourant;}
 double getCost()
 {
 	return this.cout;
 }
-
+@Override
+public int hashCode() {
+	return sommetCourant.getId();
+}
 
 public String toString() {
-	   return "Noeud sommet : " +this.sommet_courant.getId() + "marque :" + Boolean.toString(this.marque)+
+	   return "Noeud sommet : " +this.sommetCourant.getId() + "marque :" + Boolean.toString(this.marque)+
 			   " Cout :" +Double.toString(this.cout)+"Noeud pere : " +this.pere.getId() ;
 	}
 @Override
