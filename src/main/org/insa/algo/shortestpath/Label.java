@@ -34,10 +34,11 @@ double getCost()
 {
 	return this.cout;
 }
+/* fake good idea : multiple arc from same node
 @Override
 public int hashCode() {
 	return sommetCourant.getId();
-}
+}*/
 
 public String toString() {
 	   return "Noeud sommet : " +this.sommetCourant.getId() + "marque :" + Boolean.toString(this.marque)+
