@@ -22,7 +22,7 @@ import org.junit.Test;
 public class ShortestPathTest {
 	
 
-		private String mapName = "/home/commetud/3eme Annee MIC/Graphes-et-Algorithmes/Maps/insa.mapgr";
+		private String mapName = "/Users/ejigu/Downloads/fractal.mapgr";
 		
 		
 		
@@ -51,41 +51,55 @@ public class ShortestPathTest {
 		private Node pickNode(Graph graph) {
 			return graph.get((int)Math.random()*(graph.size()));
 		}
+		
+		
+		public void randomtest(Graph graph,ShortestPathSolution bSolution, BellmanFordAlgorithm bellman,DijkstraAlgorithm dij, ShortestPathSolution dSolution, ShortestPathData d)
+		{
+			d=new ShortestPathData(graph, pickNode(graph), pickNode(graph), ArcInspectorFactory.getAllFilters().get(0));
+			bellman=new BellmanFordAlgorithm(d);
+			bSolution=bellman.run();
+			dij=new DijkstraAlgorithm(d);
+			dSolution=dij.run();
+			assertEquals(dSolution.getPath().getLength(),bSolution.getPath().getLength(),10^(-6));
+		}
+		
+		public void samenodetest(Graph graph,ShortestPathSolution bSolution, BellmanFordAlgorithm bellman,DijkstraAlgorithm dij, ShortestPathSolution dSolution, ShortestPathData d)
+		{
+			
+			Node Unique=pickNode(graph);
+			d=new ShortestPathData(graph, Unique, Unique, ArcInspectorFactory.getAllFilters().get(0));
+			bellman=new BellmanFordAlgorithm(d);
+			bSolution=bellman.run();
+			dij=new DijkstraAlgorithm(d);
+			dSolution=dij.run();
+			assertEquals(dSolution.getPath().getLength(),bSolution.getPath().getLength(),10^(-6));
+		}
+			
+		
+		
+		
+		
 		@Test
 	public void test() {
 		Graph graph=LireGraphe(mapName);
-		ShortestPathSolution bSolution;
-		BellmanFordAlgorithm bellman;
-		DijkstraAlgorithm dij;
-		ShortestPathSolution dSolution; 
-		ShortestPathData d;
+		ShortestPathSolution bSolution = null;
+		BellmanFordAlgorithm bellman = null;
+		DijkstraAlgorithm dij = null;
+		ShortestPathSolution dSolution = null; 
+		ShortestPathData d = null;
 		
-		d=new ShortestPathData(graph, pickNode(graph), pickNode(graph), ArcInspectorFactory.getAllFilters().get(0));
-		bellman=new BellmanFordAlgorithm(d);
-		bSolution=bellman.run();
-		dij=new DijkstraAlgorithm(d);
-		dSolution=dij.run();
-		assertEquals(dSolution.getPath().getLength(),bSolution.getPath().getLength(),10^(-6));
 		
-		d=new ShortestPathData(graph, pickNode(graph), pickNode(graph), ArcInspectorFactory.getAllFilters().get(0));
-		bSolution=bellman.run();
-		dij=new DijkstraAlgorithm(d);
-		dSolution=dij.run();
-		assertEquals(dSolution.getPath().getLength(),bSolution.getPath().getLength(),10^(-6));
+		for (int i=0; i<5;i++)
+		{
+			randomtest(graph,bSolution,bellman,dij,dSolution,d);
+		}
 		
-		 d=new ShortestPathData(graph, pickNode(graph), pickNode(graph), ArcInspectorFactory.getAllFilters().get(0));
-		 bellman=new BellmanFordAlgorithm(d);
-		 bSolution=bellman.run();
-		dij=new DijkstraAlgorithm(d);
-		dSolution=dij.run();
-		assertEquals(dSolution.getPath().getLength(),bSolution.getPath().getLength(),10^(-6));
+		samenodetest(graph,bSolution,bellman,dij,dSolution,d);
 		
-		 d=new ShortestPathData(graph, pickNode(graph), pickNode(graph), ArcInspectorFactory.getAllFilters().get(0));
-		 bellman=new BellmanFordAlgorithm(d);
-		 bSolution=bellman.run();
-		 dij=new DijkstraAlgorithm(d);
-		dSolution=dij.run();
-		assertEquals(dSolution.getPath().getLength(),bSolution.getPath().getLength(),10^(-6));
+		
+		
+		
+		
 		}
 		
 		
