@@ -22,38 +22,39 @@ import org.junit.Test;
 public class ShortestPathTest {
 	
 
-		private String mapName = "/Users/ejigu/Downloads/fractal.mapgr";
+		private String mapName = "/Users/abdel/Downloads/fractal.mapgr";
 		
-		
+		final private double epsilon = 10^-6;
 		
 		public Graph LireGraphe(String filePath) {
   //  JFileChooser chooser = FileUtils.createFileChooser(FolderType.Map);
     
         //graphFilePath = chooser.getSelectedFile().getAbsolutePath();
-        DataInputStream stream;
-        try {
-            stream = new DataInputStream(new BufferedInputStream(
-                    new FileInputStream(filePath)));
-        }
-        catch (IOException e1) {
-            
-                System.out.println("Cannot open the selected file.");
-            return null;
-        }
-        try {
-			return new BinaryGraphReader(stream).read();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
+	        DataInputStream stream;
+	        try {
+	            stream = new DataInputStream(new BufferedInputStream(new FileInputStream(filePath)));
+	        }
+	        catch (IOException e1) {
+	            System.out.println("Cannot open the selected file.");
+	            return null;
+	        }
+	        
+	        try {
+				return new BinaryGraphReader(stream).read();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
+			}
+        
 		}
-    }
+		
 		private Node pickNode(Graph graph) {
 			return graph.get((int)(Math.random()*(graph.size())));
 		}
 		
 		
-		public void randomtest(Graph graph,ShortestPathSolution bSolution, BellmanFordAlgorithm bellman,DijkstraAlgorithm dij, ShortestPathSolution dSolution, ShortestPathData d)
+		public void randomtest(Graph graph, ShortestPathSolution bSolution, BellmanFordAlgorithm bellman,DijkstraAlgorithm dij, ShortestPathSolution dSolution, ShortestPathData d)
 		{
 			d=new ShortestPathData(graph, pickNode(graph), pickNode(graph), ArcInspectorFactory.getAllFilters().get(0));
 			bellman=new BellmanFordAlgorithm(d);
@@ -61,7 +62,7 @@ public class ShortestPathTest {
 			dij=new DijkstraAlgorithm(d);
 			dSolution=dij.run();
 			if (dSolution.isFeasible() && bSolution.isFeasible())
-				{assertEquals(dSolution.getPath().getLength(),bSolution.getPath().getLength(),10^(-6));
+				{assertEquals(dSolution.getPath().getLength(),bSolution.getPath().getLength(),epsilon);
 		
 				}
 				
@@ -101,10 +102,7 @@ public class ShortestPathTest {
 		
 		samenodetest(graph,bSolution,bellman,dij,bSolution,d);
 		
-		
-		
-		
-		
+	
 		}
 		
 		

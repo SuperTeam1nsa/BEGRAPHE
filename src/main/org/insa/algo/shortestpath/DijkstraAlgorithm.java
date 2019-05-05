@@ -47,11 +47,11 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
         BinaryHeap<Label> tas=new BinaryHeap<Label>();
         
-        //on insère le 1er élément
+        //on insere le premier element
         tas.insert(map[data.getOrigin().getId()]);
      
         
-        Label labelCurrentNode; // Le label du noeud qu'on evalue à un instant de la boucle while
+        Label labelCurrentNode; // Le label du noeud qu'on evalue a� un instant de la boucle while
         Label labelNextNode; // L'un des successeur de currentNode
         //boolean stillContinue = true;
        do {
@@ -62,10 +62,9 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         	for(Arc a : labelCurrentNode.getNode().getSuccessors()) {
         		// Small test to check allowed roads...
                 if (data.isAllowed(a)) {
-                	//labelNextNode.set = a.getDestination(); //Remplir la destination ou bien virer de la Claass car ne sert à rien
+                	//labelNextNode.set = a.getDestination(); //Remplir la destination ou bien virer de la class car ne sert a� rien
 	        		//labelNextNode=map[a.getDestination().getId()];
                 	labelNextNode=map[a.getDestination().getId()];
-                	
                 	
 	        		if(!labelNextNode.getMarque()) {
 	        			
@@ -83,15 +82,17 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 	        				labelNextNode.setCost(newDistance);
 	        				//labelNextNode.setFather(a.getOrigin());
 	        				
-	        				/*try {
-								tas.remove(labelNextNode);
-							} 
-	        				catch (ElementNotFoundException e) {
-								//e.printStackTrace();
-							}
-	        				finally {
-	        					tas.insert(labelNextNode);
-	        				}*/
+	        				/* 	*************************************************
+	        				try {												*
+								tas.remove(labelNextNode);						*
+							} 													*
+	        				catch (ElementNotFoundException e) {				*
+								//e.printStackTrace();							*
+							}													*
+	        				finally {											*
+	        					tas.insert(labelNextNode);						*
+	        				}													*
+	        				***************************************************** */
 	        				
 	        				if(Double.isInfinite(oldDistance)) {
 	        					tas.insert(labelNextNode);
@@ -101,9 +102,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 	        					try {
 									tas.remove(labelNextNode);
 								} 
-		        				catch (ElementNotFoundException e) {
-		        					
-								}
+		        				catch(ElementNotFoundException e) {}
 	        					tas.insert(labelNextNode);
 	        				}
 	        				
@@ -116,6 +115,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         		
         	}
         } while( !tas.isEmpty() && labelCurrentNode.getNode().getId()!=data.getDestination().getId());
+       
         ShortestPathSolution solution = null;
 
         // Destination has no predecessor, the solution is infeasible...
