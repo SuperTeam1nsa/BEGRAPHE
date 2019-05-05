@@ -15,7 +15,7 @@ public abstract class AbstractSolution {
      *
      */
     public enum Status {
-        UNKNOWN, INFEASIBLE, FEASIBLE, OPTIMAL,
+        UNKNOWN, INFEASIBLE, FEASIBLE, OPTIMAL, TRIVIAL,
     };
 
     // Status of the solution.
@@ -74,10 +74,10 @@ public abstract class AbstractSolution {
     }
 
     /**
-     * @return true if the solution is feasible or optimal.
+     * @return true if the solution is feasible or optimal or trivial.
      */
     public boolean isFeasible() {
-        return status == Status.FEASIBLE || status == Status.OPTIMAL;
+        return status == Status.FEASIBLE || status == Status.OPTIMAL || status == Status.TRIVIAL;
     }
 
 }

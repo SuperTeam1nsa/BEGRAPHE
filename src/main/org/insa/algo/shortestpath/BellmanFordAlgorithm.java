@@ -21,6 +21,11 @@ public class BellmanFordAlgorithm extends ShortestPathAlgorithm {
 
         // Retrieve the graph.
         ShortestPathData data = getInputData();
+        
+        if (data.getOrigin().getId() == data.getDestination().getId()){
+        	return new ShortestPathSolution(data, Status.TRIVIAL);
+        }
+        
         Graph graph = data.getGraph();
 
         final int nbNodes = graph.size();

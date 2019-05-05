@@ -60,6 +60,11 @@ public class ShortestPathSolution extends AbstractSolution {
                     getInputData().getOrigin().getId(), getInputData().getDestination().getId());
         }
         else {
+        	if(this.getStatus() == Status.TRIVIAL) {
+        		info = String.format("[ TRIVIAL ] It is the same node : origin node #%d , destination node #%d",
+                        getInputData().getOrigin().getId(), getInputData().getDestination().getId());
+        		return info;
+        	}
             double cost = 0;
             for (Arc arc: getPath().getArcs()) {
                 cost += getInputData().getCost(arc);

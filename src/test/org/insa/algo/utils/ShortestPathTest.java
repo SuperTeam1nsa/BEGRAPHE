@@ -22,7 +22,7 @@ import org.junit.Test;
 public class ShortestPathTest {
 	
 
-		private String mapName = "/Users/abdel/Downloads/fractal.mapgr";
+		private String mapName = "/Users/abdel/workspace/BEGRAPHE/maps/fractal.mapgr";
 		
 		final private double epsilon = 10^-6;
 		
@@ -62,7 +62,10 @@ public class ShortestPathTest {
 			dij=new DijkstraAlgorithm(d);
 			dSolution=dij.run();
 			if (dSolution.isFeasible() && bSolution.isFeasible())
-				{assertEquals(dSolution.getPath().getLength(),bSolution.getPath().getLength(),epsilon);
+				{
+				double speed = 100;
+				assertEquals(dSolution.getPath().getLength(),bSolution.getPath().getLength(),epsilon);
+				assertEquals(dSolution.getPath().getTravelTime(speed), bSolution.getPath().getTravelTime(speed),epsilon);
 		
 				}
 				
@@ -77,7 +80,10 @@ public class ShortestPathTest {
 			bSolution=bellman.run();
 			dij=new DijkstraAlgorithm(d);
 			dSolution=dij.run();
+			System.out.println(dSolution.toString());
+			System.out.println(bSolution.toString());
 			assertEquals(dSolution.toString().substring(0,3),bSolution.toString().substring(0,3));
+			
 		}
 			
 		
