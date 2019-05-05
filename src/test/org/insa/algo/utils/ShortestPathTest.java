@@ -60,19 +60,23 @@ public class ShortestPathTest {
 			bSolution=bellman.run();
 			dij=new DijkstraAlgorithm(d);
 			dSolution=dij.run();
-			assertEquals(dSolution.getPath().getLength(),bSolution.getPath().getLength(),10^(-6));
+			if (dSolution.isFeasible() && bSolution.isFeasible())
+				{assertEquals(dSolution.getPath().getLength(),bSolution.getPath().getLength(),10^(-6));
+		
+				}
+				
 		}
 		
-		public void samenodetest(Graph graph,ShortestPathSolution bSolution, BellmanFordAlgorithm bellman,BellmanFordAlgorithm dij, ShortestPathSolution dSolution, ShortestPathData d)
+		public void samenodetest(Graph graph,ShortestPathSolution bSolution, BellmanFordAlgorithm bellman,DijkstraAlgorithm dij, ShortestPathSolution dSolution, ShortestPathData d)
 		{
 			
 			Node Unique=pickNode(graph);
 			d=new ShortestPathData(graph, Unique, Unique, ArcInspectorFactory.getAllFilters().get(0));
 			bellman=new BellmanFordAlgorithm(d);
 			bSolution=bellman.run();
-			dij=new BellmanFordAlgorithm(d);
+			dij=new DijkstraAlgorithm(d);
 			dSolution=dij.run();
-			assertEquals(dSolution.getPath().getLength(),bSolution.getPath().getLength(),10^(-6));
+			assertEquals(dSolution.toString().substring(0,3),bSolution.toString().substring(0,3));
 		}
 			
 		
@@ -84,7 +88,7 @@ public class ShortestPathTest {
 		Graph graph=LireGraphe(mapName);
 		ShortestPathSolution bSolution = null;
 		BellmanFordAlgorithm bellman = null;
-		BellmanFordAlgorithm dij = null;
+		DijkstraAlgorithm dij = null;
 		ShortestPathSolution dSolution = null; 
 		ShortestPathData d = null;
 		
@@ -92,10 +96,10 @@ public class ShortestPathTest {
 		
 		for (int i=0; i<5;i++)
 		{
-			//randomtest(graph,bSolution,bellman,dij,dSolution,d);
+			randomtest(graph,bSolution,bellman,dij,dSolution,d);
 		}
 		
-		samenodetest(graph,bSolution,bellman,bellman,bSolution,d);
+		samenodetest(graph,bSolution,bellman,dij,bSolution,d);
 		
 		
 		
