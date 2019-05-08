@@ -22,7 +22,7 @@ import org.junit.Test;
 public class ShortestPathTest {
 	
 
-		private String mapName = "/Users/abdel/workspace/BEGRAPHE/maps/fractal.mapgr";
+		private String mapName = "/home/commetud/3emeAnneMIC/Graphes-et-Algorithmes/Maps/guadeloupe.mapgr";
 		
 		final private double epsilon = 10^-6;
 		
@@ -101,7 +101,7 @@ public class ShortestPathTest {
 		
 		
 		
-		for (int i=0; i<5;i++)
+		for (int i=0; i<1;i++)
 		{
 			randomtest(graph,bSolution,bellman,dij,dSolution,d);
 		}

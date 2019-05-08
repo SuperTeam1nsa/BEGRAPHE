@@ -24,12 +24,11 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
     	
     	// Retrieve the graph.
         ShortestPathData data = getInputData();
+        Graph graph = data.getGraph();
         
         if (data.getOrigin().getId() == data.getDestination().getId()){
         	return new ShortestPathSolution(data, Status.TRIVIAL);
         }
-        
-        Graph graph = data.getGraph();
 
         final int nbNodes = graph.size();
 
@@ -48,15 +47,15 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         notifyOriginProcessed(data.getOrigin());
 
         // Initialisation du tableau des arcs contenant les predecesseurs
-        Arc[] predecessorArcs = new Arc[nbNodes];
+        //Arc[] predecessorArcs = new Arc[nbNodes];
 
         BinaryHeap<Label> tas=new BinaryHeap<Label>();
         
-        //on insere le premier element
+        //on insère le 1er élément
         tas.insert(map[data.getOrigin().getId()]);
      
         
-        Label labelCurrentNode; // Le label du noeud qu'on evalue a� un instant de la boucle while
+        Label labelCurrentNode; // Le label du noeud qu'on evalue à un instant de la boucle while
         Label labelNextNode; // L'un des successeur de currentNode
         //boolean stillContinue = true;
        do {
@@ -64,13 +63,12 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         	//Extract the current Label 
         	labelCurrentNode=tas.deleteMin();        	
         	labelCurrentNode.setMarque(true);
-        	
         	for(Arc a : labelCurrentNode.getNode().getSuccessors()) {
         		// Small test to check allowed roads...
                 if (data.isAllowed(a)) {
-                	//labelNextNode.set = a.getDestination(); //Remplir la destination ou bien virer de la class car ne sert a� rien
 	        		//labelNextNode=map[a.getDestination().getId()];
                 	labelNextNode=map[a.getDestination().getId()];
+                	
                 	
 	        		if(!labelNextNode.getMarque()) {
 	        			
@@ -86,19 +84,19 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 	        			if(oldDistance>newDistance) {
 	        				//getters/setters out to enhance performance
 	        				labelNextNode.setCost(newDistance);
+	        				labelNextNode.setFather(a);
+	        				map[a.getDestination().getId()]=labelNextNode;
 	        				//labelNextNode.setFather(a.getOrigin());
 	        				
-	        				/* 	*************************************************
-	        				try {												*
-								tas.remove(labelNextNode);						*
-							} 													*
-	        				catch (ElementNotFoundException e) {				*
-								//e.printStackTrace();							*
-							}													*
-	        				finally {											*
-	        					tas.insert(labelNextNode);						*
-	        				}													*
-	        				***************************************************** */
+	        				/*try {
+								tas.remove(labelNextNode);
+							} 
+	        				catch (ElementNotFoundException e) {
+								//e.printStackTrace();
+							}
+	        				finally {
+	        					tas.insert(labelNextNode);
+	        				}*/
 	        				
 	        				if(Double.isInfinite(oldDistance)) {
 	        					tas.insert(labelNextNode);
@@ -108,11 +106,13 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 	        					try {
 									tas.remove(labelNextNode);
 								} 
-		        				catch(ElementNotFoundException e) {}
+		        				catch (ElementNotFoundException e) {
+		        					
+								}
 	        					tas.insert(labelNextNode);
 	        				}
 	        				
-	        				predecessorArcs[a.getDestination().getId()] = a;
+	        				//predecessorArcs[a.getDestination().getId()] = a;
 	        				
 	        			}
 	        		}
@@ -121,11 +121,10 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         		
         	}
         } while( !tas.isEmpty() && labelCurrentNode.getNode().getId()!=data.getDestination().getId());
-       
         ShortestPathSolution solution = null;
 
         // Destination has no predecessor, the solution is infeasible...
-        if (predecessorArcs[data.getDestination().getId()] == null) {
+        if (map[data.getDestination().getId()].getFather() == null) {
             solution = new ShortestPathSolution(data, Status.INFEASIBLE);
         }
         else {
@@ -134,11 +133,12 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
             // Create the path from the array of predecessors...
             ArrayList<Arc> arcs = new ArrayList<>();
-            Arc arc = predecessorArcs[data.getDestination().getId()];
-            //while (arc != null && arc.getOrigin() != data.getOrigin()) {
+            Arc arc = map[data.getDestination().getId()].getFather();//predecessorArcs[data.getDestination().getId()];
+            //while (arc != null && arc.getDestination() != data.getOrigin()) {
             while ( arc != null ) {
             	arcs.add(arc);
-                arc = predecessorArcs[arc.getOrigin().getId()];
+                //arc = predecessorArcs[arc.getOrigin().getId()];
+            	arc=map[arc.getOrigin().getId()].getFather();
             }
 
             // Reverse the path...
@@ -152,4 +152,73 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
     }
 
 }
-      
+           
+        /*while(!nodesUndone.isEmpty()) {
+        	evaluation =getNodeWithLowestDistance();
+        	nodesUndone.remove(evaluation);
+        	nodesDone.add(evaluation);
+        	evaluatedNeighbors(evaluation);
+        }
+        
+         * 
+         * 
+         * 
+         * 
+         * Foreach node set distance[node] = HIGH
+SettledNodes = empty
+UnSettledNodes = empty
+
+Add sourceNode to UnSettledNodes
+distance[sourceNode]= 0
+
+while (UnSettledNodes is not empty) {
+    evaluationNode = getNodeWithLowestDistance(UnSettledNodes)
+    remove evaluationNode from UnSettledNodes
+    add evaluationNode to SettledNodes
+    evaluatedNeighbors(evaluationNode)
+}
+
+
+
+evaluatedNeighbors(evaluationNode){
+    Foreach destinationNode which can be reached via an edge from evaluationNode AND which is not in SettledNodes {
+        edgeDistance = getDistance(edge(evaluationNode, destinationNode))
+        newDistance = distance[evaluationNode] + edgeDistance
+        if (distance[destinationNode]  > newDistance ) {
+            distance[destinationNode]  = newDistance
+            add destinationNode to UnSettledNodes
+        }
+    }
+}
+         */
+        //cr�ation du chemin solution
+        //� partir des �tiquettes plac�es (� rebours)
+        /*
+        Node fils = data.getDestination();
+        Node pere;
+        double total_distance=0;//pour nous
+        while(fils!=data.getOrigin()) {
+        	total_distance+=map.get(fils).getCost();
+        	pere=map.get(fils).getFather();
+        	//recuperer l'arc et l'ajouter � la liste des arcs solutions
+        	//utiliser fastest
+        	for(Arc i:pere.getSuccessors()) {
+        		if(i.getDestination()==fils) {
+        			arcsSolution.add(i);
+        			break;
+        		}
+        	}
+        	fils=pere;
+        }
+        
+        //on remet les arcs dans le bon sens:
+        Collections.reverse(arcsSolution);
+        
+        System.out.print("distance totale :"+total_distance);
+        
+        
+		//  modifier le status selon le r�sultat
+        return new ShortestPathSolution(data, Status.FEASIBLE, new Path(graph,arcsSolution));
+        */
+
+
