@@ -160,32 +160,38 @@ public class BinaryHeap<E extends Comparable<E> > implements PriorityQueue<E> {
     public void remove(E x) throws ElementNotFoundException {
     	int indexElt;
     	//int indexParent;
-        
-    	
+        int indexLast=this.currentSize-1;
+    
     	if(this.isEmpty()){
     		throw new ElementNotFoundException(x);
     	}
   
-    	//indexElt = this.array.indexOf(x);
+    	indexElt = this.array.indexOf(x);
     	//en O(1) HashMap hors hash collision (avec id qui est != pour chaque node il n'y est pas cens� y en avoir
-    	indexElt=indirection.get(x);
+    	//indexElt=indirection.get(x);
     	/*Rq pour Abdel :
     	 * Une table de hachage est une impl�mentation particuli�re d'un tableau associatif. Elle est aussi la plus courante. Basiquement il s'agit d'un tableau dont les cases contiennent un pointeur vers nil, un �l�ment ou une liste d'�l�ment. On d�termine la case � utiliser en appliquant une fonction de hachage � la cl�. Id�alement, chaque case ne pointera que vers un unique �l�ment. Dans ce cas les op�rations d'insertion, de consultation et de suppression se font en temps constant, not� O(1), c'est � dire qui ne d�pend pas du nombre d'�l�ments pr�sents dans la table de hachage. Cependant si la fonction de hachage retourne deux fois la m�me valeur pour deux cl�s diff�rentes, ce que l'on nomme collision, alors les deux valeurs sont g�n�ralement stock�es comme une liste. C'est � dire que maintenant il va falloir parcourir toute cette liste. Dans le pire cas, la fonction de hachage retourne toujours la m�me valeur, toutes les valeurs vont donc �tre stock�es dans la m�me case et l'on va devoir parcourir la liste pour chaque op�ration. La complexit� est alors lin�aire par rapport au nombre d'�l�ments dans la structure, not� O(n), ce qui est tr�s peu performant. Une table de hachage a donc une complexit� moyenne d'O(1) mais un pire cas en O(n). Il est donc crucial d'avoir une fonction de hachage performante. Les personnes n'�tant pas � l'aise avec l'impl�mentation d'une table de hachage ou les concepts pr�c�dant auront tout int�r�t � consulter la page Wikip�dia qui est assez compl�te.
     	 */
     	
-        if(indirection.get(x) == null/*indexElt==-1*/ || indexElt >= currentSize) {
+        if(/*indirection.get(x) == null*/indexElt==-1 || indexElt >= currentSize) {
         	throw new ElementNotFoundException(x);
         }
         
-
+        this.arraySet(indexElt, this.array.get(indexLast));
+        if(this.array.get(indexElt).compareTo(this.array.get(this.index_parent(indexElt)))<0)
+        	this.percolateUp(indexElt);
+        else
+        	this.percolateDown(indexElt);
+        
+        this.currentSize--;
         /*
           this.arraySet(indexElt, this.array.get(--this.currentSize));
         	this.percolateDown(indexElt);
         	this.percolateUp(indexElt);
         */
-        E min = this.deleteMin();
+       /* E min = this.deleteMin();
         this.arraySet(indexElt, min);
-        this.percolateUp(indexElt);
+        this.percolateUp(indexElt);*/
          
     }
 
