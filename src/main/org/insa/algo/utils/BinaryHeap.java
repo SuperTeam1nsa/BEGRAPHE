@@ -10,6 +10,7 @@
 package org.insa.algo.utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Implements a binary heap. Note that all "matching" is based on the compareTo
@@ -25,6 +26,7 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
 
     // The heap array.
     private final ArrayList<E> array;
+    private HashMap<E,Integer> indirection;
 
     /**
      * Construct a new empty binary heap.
@@ -160,12 +162,12 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
 		}
 		else {
     		// Si l'element supprime est avant le dernier
-			//rq: si on ne fait pas ce test 
-    		//if (indexLast>indexElt) {
+			//rq: si on ne fait pas ce check test heap ok mais faux 
+    		if (indexLast>indexElt) {
         		this.array.set(indexElt, this.array.get(indexLast));
         		this.percolateDown(indexElt);
         		this.percolateUp(indexElt);	        		
-    		//}
+    		}
     	}
 		this.currentSize--;
     }
