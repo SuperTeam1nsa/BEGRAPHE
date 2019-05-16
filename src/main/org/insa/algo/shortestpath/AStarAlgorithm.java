@@ -46,8 +46,6 @@ public class AStarAlgorithm extends DijkstraAlgorithm {
         // Notify observers about the first event (origin processed).
         notifyOriginProcessed(data.getOrigin());
 
-        // Initialisation du tableau des arcs contenant les predecesseurs
-        Arc[] predecessorArcs = new Arc[nbNodes];
 
         BinaryHeap<LabelStar> tas=new BinaryHeap<LabelStar>();
         
@@ -66,38 +64,27 @@ public class AStarAlgorithm extends DijkstraAlgorithm {
         	for(Arc a : labelCurrentNode.getNode().getSuccessors()) {
         		// Small test to check allowed roads...
                 if (data.isAllowed(a)) {
-                	//labelNextNode.set = a.getDestination(); //Remplir la destination ou bien virer de la Claass car ne sert à rien
-	        		//labelNextNode=map[a.getDestination().getId()];
+                	
                 	labelNextNode=map[a.getDestination().getId()];
                 	
                 	
 	        		if(!labelNextNode.getMarque()) {
 	        			
-	        			double currentCost = data.getCost(a); //need
-	        			//double currentCost = a.getLength();
-	        			double oldDistance = labelNextNode.getTotalCost(); 
-	                    double newDistance = labelCurrentNode.getCostFromOrigin() + currentCost + labelCurrentNode.getCostFromDest();
+	        			double currentCost = data.getCost(a); 
+
+	        			double oldDistance = labelNextNode.getCostFromOrigin(); 
+	                    double newDistance = labelCurrentNode.getCostFromOrigin() + currentCost;
 	                    
 	                    if(Double.isInfinite(oldDistance) && Double.isFinite(newDistance)) {
 	                        notifyNodeReached(a.getDestination());
 	                    }
 	                    
 	        			if(oldDistance>newDistance) {
-	        				//getters/setters out to enhance performance
+
 	        				labelNextNode.setCostFromOrig(labelCurrentNode.getCostFromOrigin() + currentCost );
 	        				labelNextNode.setFather(a);
-	        				map[a.getDestination().getId()]=labelNextNode;
-	        				//labelNextNode.setFather(a.getOrigin());
+	        			
 	        				
-	        				/*try {
-								tas.remove(labelNextNode);
-							} 
-	        				catch (ElementNotFoundException e) {
-								//e.printStackTrace();
-							}
-	        				finally {
-	        					tas.insert(labelNextNode);
-	        				}*/
 	        				
 	        				if(Double.isInfinite(oldDistance)) {
 	        					tas.insert(labelNextNode);
@@ -112,8 +99,7 @@ public class AStarAlgorithm extends DijkstraAlgorithm {
 								}
 	        					tas.insert(labelNextNode);
 	        				}
-	        				
-	        				//predecessorArcs[a.getDestination().getId()] = a;
+	        
 	        				
 	        			}
 	        		}
@@ -125,7 +111,7 @@ public class AStarAlgorithm extends DijkstraAlgorithm {
         ShortestPathSolution solution = null;
 
         // Destination has no predecessor, the solution is infeasible...
-        if (predecessorArcs[data.getDestination().getId()] == null) {
+        if (map[data.getDestination().getId()].getFather() == null) {
             solution = new ShortestPathSolution(data, Status.INFEASIBLE);
         }
         else {
@@ -134,11 +120,10 @@ public class AStarAlgorithm extends DijkstraAlgorithm {
 
             // Create the path from the array of predecessors...
             ArrayList<Arc> arcs = new ArrayList<>();
-            Arc arc = map[data.getDestination().getId()].getFather();//predecessorArcs[data.getDestination().getId()];
+            Arc arc = map[data.getDestination().getId()].getFather();
             //while (arc != null && arc.getDestination() != data.getOrigin()) {
             while ( arc != null ) {
             	arcs.add(arc);
-                //arc = predecessorArcs[arc.getOrigin().getId()];
             	arc=map[arc.getOrigin().getId()].getFather();
             }
 
