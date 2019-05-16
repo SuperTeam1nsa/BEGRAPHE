@@ -34,6 +34,7 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
     public BinaryHeap() {
         this.currentSize = 0;
         this.array = new ArrayList<E>();
+        indirection=new HashMap<E,Integer>();
     }
 
     /**
@@ -44,8 +45,9 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
     public BinaryHeap(BinaryHeap<E> heap) {
         this.currentSize = heap.currentSize;
         this.array = new ArrayList<E>(heap.array);
+        indirection= new HashMap<E,Integer>(heap.indirection);
     }
-
+    
     /**
      * Set an element at the given index.
      * 
@@ -53,6 +55,7 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
      * @param value Element to set.
      */
     private void arraySet(int index, E value) {
+    	indirection.put(value, index);
         if (index == this.array.size()) {
             this.array.add(value);
         }
@@ -154,10 +157,13 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
 			throw new ElementNotFoundException(x);
 		}
 
-		indexElt = this.array.indexOf(x);
-		
+		//indexElt = this.array.indexOf(x);
+		if(indirection.containsKey(x))
+		indexElt=indirection.get(x); //en O(1)
+		else
+			throw new ElementNotFoundException(x);	
 
-		if (/* indirection.get(x) == null */indexElt == -1 || indexElt >= currentSize) {
+		if (indexElt >= currentSize) {
 			throw new ElementNotFoundException(x);
 		}
 		else {
@@ -165,10 +171,12 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
 			//rq: si on ne fait pas ce check test heap ok mais faux 
     		if (indexLast>indexElt) {
         		this.array.set(indexElt, this.array.get(indexLast));
+        		indirection.put(this.array.get(indexLast), indexElt);
         		this.percolateDown(indexElt);
         		this.percolateUp(indexElt);	        		
     		}
     	}
+		indirection.remove(x);
 		this.currentSize--;
     }
 
@@ -182,6 +190,7 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
     @Override
     public E deleteMin() throws EmptyPriorityQueueException {
         E minItem = findMin();
+        indirection.remove(minItem);
         E lastItem = this.array.get(--this.currentSize);
         this.arraySet(0, lastItem);
         this.percolateDown(0);
