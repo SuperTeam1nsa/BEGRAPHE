@@ -6,7 +6,7 @@ import org.insa.graph.*;
 
 public class Label implements Comparable<Label> {
 
-	private 
+	protected 
 	Node sommetCourant ;
 	boolean marque; 
 	double cout; 
@@ -24,16 +24,7 @@ public boolean getMarque() {return marque;}
 public void setMarque(boolean value) {marque=value;}
 
 public void setCost(double cost) {cout=cost;}
-
-
-
 public Node getNode() {return sommetCourant;}
-protected double getCost()
-
-{
-	return this.cout;
-}
-
 /* 
 @Override
 public int hashCode() {

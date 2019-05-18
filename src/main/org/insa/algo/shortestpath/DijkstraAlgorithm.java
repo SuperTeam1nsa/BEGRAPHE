@@ -17,29 +17,21 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
     public DijkstraAlgorithm(ShortestPathData data) {
         super(data);
     }
-    
-    
+    protected Label[] map;
+    protected ShortestPathData data;
     @Override
     protected ShortestPathSolution doRun() {
     	
     	// Retrieve the graph.
-        ShortestPathData data = getInputData();
+        data = getInputData();
         Graph graph = data.getGraph();
         
         if (data.getOrigin().getId() == data.getDestination().getId()){
         	return new ShortestPathSolution(data, Status.TRIVIAL);
         }
 
-        final int nbNodes = graph.size();
-
-        // Initialisation du tableau des Labels
-        Label[] map = new Label[nbNodes];
-        
-        //Remplissage du tableau des labels
-        for(Node n:graph.getNodes()) {
-        	map[n.getId()]=new Label(n);
-        }
-        
+        initLabel(graph);
+      
         //Initialisation du coût du noeud initial à 0
         map[data.getOrigin().getId()].setCost(0);
         
@@ -74,8 +66,8 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 	        			
 	        			double currentCost = data.getCost(a); //need
 	        			//double currentCost = a.getLength();
-	        			double oldDistance = labelNextNode.getCost();
-	                    double newDistance = labelCurrentNode.getCost() + currentCost;
+	        			double oldDistance = labelNextNode.getTotalCost();
+	                    double newDistance = labelCurrentNode.getTotalCost() + currentCost;
 	                    
 	                    if (Double.isInfinite(oldDistance) && Double.isFinite(newDistance)) {
 	                        notifyNodeReached(a.getDestination());
@@ -135,6 +127,13 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
         return solution;
     }
+    protected void initLabel(Graph graph) {
+    	map=new Label[graph.size()];
+    	  //Remplissage du tableau des labels
+        for(Node n:graph.getNodes()) {
+        	map[n.getId()]=new Label(n);
+        }
+	}
 
 }
 
