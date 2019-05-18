@@ -24,7 +24,14 @@ public boolean getMarque() {return marque;}
 public void setMarque(boolean value) {marque=value;}
 
 public void setCost(double cost) {cout=cost;}
+public double getTotalCost() {return cout;}
+public double getCost() {return cout;}
 public Node getNode() {return sommetCourant;}
+public void setFather(Arc a) { pere=a;}
+public Arc getFather() {
+	return pere;
+}
+
 /* 
 @Override
 public int hashCode() {
@@ -36,7 +43,7 @@ public String toString() {
 			   " Cout :" +Double.toString(this.cout)+"Noeud pere : " +this.pere.getOrigin().getId() ;
 	}
 
-public double getTotalCost() {return cout;}
+
 
 @Override
 public int compareTo(Label o) {
@@ -44,13 +51,7 @@ public int compareTo(Label o) {
 	double current_cost=getTotalCost();
 	return current_cost-other_cost>0?1:current_cost==other_cost?0:-1;
 }
-public void setFather(Arc a) {
-	pere=a;
-	
-}
-public Arc getFather() {
-	return pere;
-}
+
 
 }
 
