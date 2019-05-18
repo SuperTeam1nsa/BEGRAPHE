@@ -9,12 +9,14 @@ public class ShortestPathSolution extends AbstractSolution {
 
     // Optimal solution.
     private Path path;
+    private double cost = -1;
 
     /**
      * {@inheritDoc}
      */
     public ShortestPathSolution(ShortestPathData data) {
         super(data);
+        
     }
 
     /**
@@ -38,6 +40,13 @@ public class ShortestPathSolution extends AbstractSolution {
     public ShortestPathSolution(ShortestPathData data, Status status, Path path) {
         super(data, status);
         this.path = path;
+        double cst = 0;
+        for (Arc arc: getPath().getArcs()) {
+            cst += getInputData().getCost(arc);
+        }
+        this.cost = cst;
+        
+        
     }
 
     @Override
@@ -50,6 +59,13 @@ public class ShortestPathSolution extends AbstractSolution {
      */
     public Path getPath() {
         return path;
+    }
+    
+    /**
+     * @return The path of this solution, if any.
+     */
+    public double getCost() {
+        return cost;
     }
 
     @Override
@@ -65,10 +81,9 @@ public class ShortestPathSolution extends AbstractSolution {
                         getInputData().getOrigin().getId(), getInputData().getDestination().getId());
         		return info;
         	}
-            double cost = 0;
-            for (Arc arc: getPath().getArcs()) {
-                cost += getInputData().getCost(arc);
-            }
+        	
+            double cost = this.getCost();
+            
             info = String.format("Found a path from node #%d to node #%d",
                     getInputData().getOrigin().getId(), getInputData().getDestination().getId());
             if (getInputData().getMode() == Mode.LENGTH) {
