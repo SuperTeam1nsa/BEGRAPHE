@@ -13,6 +13,7 @@ import java.io.IOException;
 import org.insa.algo.ArcInspectorFactory;
 import org.insa.algo.shortestpath.BellmanForTests;
 import org.insa.algo.shortestpath.BellmanFordAlgorithm;
+import org.insa.algo.shortestpath.BinaryHeapObserver;
 import org.insa.algo.shortestpath.DijkstraAlgorithm;
 import org.insa.algo.shortestpath.ShortestPathData;
 import org.insa.algo.shortestpath.ShortestPathSolution;
@@ -152,6 +153,7 @@ public class ShortestPathTest {
 			System.out.println("id "+Integer.toString( origin.getId()));
 
 			double [] bellmanData=bellRun.runMyTests();
+			BinaryHeapObserver myObserver=new BinaryHeapObserver(); 
 			
 			/*
 			for (int i=0;i<graph.size();i++)
@@ -168,16 +170,18 @@ public class ShortestPathTest {
 				DijkstraAlgorithm dij=null;
 				ShortestPathSolution dSolution = null; 
 
-				for (int i=0; i<50;i++)
+				for (int i=0; i<1;i++)
 				{
 					testNode=pickNode(graph); 
 					if (bellmanData[testNode.getId()]!=Double.POSITIVE_INFINITY & bellmanData[testNode.getId()]!=0.0)
 					{
 						d=new ShortestPathData(graph,origin,testNode,ArcInspectorFactory.getAllFilters().get(2));
 						dij= new DijkstraAlgorithm(d);
+						dij.addObserver(myObserver);
+
 						dSolution=dij.run();
 						assertEquals(dSolution.getPath().getMinimumTravelTime(),bellmanData[testNode.getId()],epsilon);
-
+						System.out.println("nb explores= "+Integer.toString(myObserver.getNb_explores())+"nb marques= "+Integer.toString(myObserver.getNb_marques()) +"nb max tas= "+ Integer.toString(myObserver.getMax_tas()));
 
 						
 					}

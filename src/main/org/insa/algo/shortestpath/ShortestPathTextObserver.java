@@ -34,4 +34,10 @@ public class ShortestPathTextObserver implements ShortestPathObserver {
 
     }
 
+	@Override
+	public void notifyHeapInsertion(int size) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

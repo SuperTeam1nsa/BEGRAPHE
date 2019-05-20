@@ -38,4 +38,10 @@ public class ShortestPathGraphicObserver implements ShortestPathObserver {
         // drawing.drawMarker(node.getPoint(), Color.RED);
     }
 
+	@Override
+	public void notifyHeapInsertion(int size) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

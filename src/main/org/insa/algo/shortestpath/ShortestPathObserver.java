@@ -34,4 +34,11 @@ public interface ShortestPathObserver {
 	 */
 	public void notifyDestinationReached(Node node);
 	
+	
+	/**updates Binary Heap size 
+	 * 
+	 * @param size
+	 */
+	public void notifyHeapInsertion(int size);
+	
 }

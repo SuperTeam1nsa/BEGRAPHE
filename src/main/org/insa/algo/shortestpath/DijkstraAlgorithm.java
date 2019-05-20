@@ -53,8 +53,10 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
        do {
 
         	//Extract the current Label 
-        	labelCurrentNode=tas.deleteMin();        	
+        	labelCurrentNode=tas.deleteMin();
+        	
         	labelCurrentNode.setMarque(true);
+        	notifyNodeMarked(labelCurrentNode.getNode());
         	for(Arc a : labelCurrentNode.getNode().getSuccessors()) {
         		// Small test to check allowed roads...
                 if (data.isAllowed(a)) {
@@ -90,7 +92,9 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 		        					
 								}
 	        					tas.insert(labelNextNode);
-	        			   }	
+	        			   }
+	        				if (this.getObservers().size()>0)
+	        					this.getObservers().get(0).notifyHeapInsertion(tas.size());
 	        			}
 	        		}
         		
