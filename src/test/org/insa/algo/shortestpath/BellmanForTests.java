@@ -10,22 +10,19 @@ import org.insa.graph.Graph;
 import org.insa.graph.Node;
 import org.insa.graph.Path;
 
-public class BellmanFordAlgorithm extends ShortestPathAlgorithm {
+public class BellmanForTests extends ShortestPathAlgorithm {
 
-    public BellmanFordAlgorithm(ShortestPathData data) {
+    public BellmanForTests(ShortestPathData data) {
         super(data);
     }
 
-    @Override
-    protected ShortestPathSolution doRun() {
+    
+    public double [] runMyTests() {
 
         // Retrieve the graph.
         ShortestPathData data = getInputData();
         
-        if (data.getOrigin().getId() == data.getDestination().getId()){
-        	return new ShortestPathSolution(data, Status.TRIVIAL);
-        }
-        
+    
         Graph graph = data.getGraph();
 
         final int nbNodes = graph.size();
@@ -73,34 +70,14 @@ public class BellmanFordAlgorithm extends ShortestPathAlgorithm {
             }
         }
 
-        ShortestPathSolution solution = null;
-      
-
-        // Destination has no predecessor, the solution is infeasible...
-        if (predecessorArcs[data.getDestination().getId()] == null) {
-            solution = new ShortestPathSolution(data, Status.INFEASIBLE);
-        }
-        else {
-
-            // The destination has been found, notify the observers.
-	        notifyDestinationReached(data.getDestination());
-
-            // Create the path from the array of predecessors...
-            ArrayList<Arc> arcs = new ArrayList<>();
-            Arc arc = predecessorArcs[data.getDestination().getId()];
-            while (arc != null) {
-                arcs.add(arc);
-                arc = predecessorArcs[arc.getOrigin().getId()];
-            }
-
-            // Reverse the path...
-            Collections.reverse(arcs);
-
-            // Create the final solution.
-            solution = new ShortestPathSolution(data, Status.OPTIMAL, new Path(graph, arcs));
-        }
-
-        return solution;
+     return distances;
     }
+
+
+	@Override
+	protected ShortestPathSolution doRun() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
