@@ -55,7 +55,11 @@ public abstract class ShortestPathAlgorithm extends AbstractAlgorithm<ShortestPa
             obs.notifyNodeMarked(node);
         }
     }
-
+    public void notifyHeapInsertion(int size) {
+    	for (ShortestPathObserver obs: getObservers()) {
+            obs.notifyHeapInsertion(size);
+        }
+    }
     /**
      * Notify all observers that the destination has been reached.
      * 
@@ -66,4 +70,5 @@ public abstract class ShortestPathAlgorithm extends AbstractAlgorithm<ShortestPa
             obs.notifyDestinationReached(node);
         }
     }
+    
 }

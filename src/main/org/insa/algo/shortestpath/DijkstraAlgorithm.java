@@ -93,9 +93,9 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 								}
 	        					tas.insert(labelNextNode);
 	        			   }
-	        				if (this.getObservers().size()>0)
-	        					this.getObservers().get(0).notifyHeapInsertion(tas.size());
+	        				notifyHeapInsertion(tas.size());
 	        			}
+	        				
 	        		}
         		
                 }
@@ -131,7 +131,8 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
         return solution;
     }
-    protected void initLabel(Graph graph) {
+ 
+	protected void initLabel(Graph graph) {
     	map=new Label[graph.size()];
     	  //Remplissage du tableau des labels
         for(Node n:graph.getNodes()) {

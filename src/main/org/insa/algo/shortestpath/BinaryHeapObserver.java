@@ -85,6 +85,7 @@ public class BinaryHeapObserver implements ShortestPathObserver{
 			max_tas=new_size; 
 		}
 	}
+
 	
 
 }

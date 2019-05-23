@@ -39,6 +39,6 @@ public interface ShortestPathObserver {
 	 * 
 	 * @param size
 	 */
-	public void notifyHeapInsertion(int size);
+	public void notifyHeapInsertion(int s);
 	
 }
