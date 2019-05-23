@@ -28,6 +28,8 @@ public class ShortestPathSolution extends AbstractSolution {
      */
     public ShortestPathSolution(ShortestPathData data, Status status) {
         super(data, status);
+        if(status == Status.TRIVIAL) 
+        	cost = 0;
     }
 
     /**
@@ -62,11 +64,12 @@ public class ShortestPathSolution extends AbstractSolution {
     }
     
     /**
-     * @return The path of this solution, if any.
+     * @return The cost of this solution, if any.
      */
     public double getCost() {
         return cost;
     }
+    
 
     @Override
     public String toString() {

@@ -11,14 +11,12 @@ import org.insa.graph.Node;
 import org.insa.graph.Path;
 
 public class BellmanFordAlgorithm extends ShortestPathAlgorithm {
-	
-	
-    double[] distances;
 
     public BellmanFordAlgorithm(ShortestPathData data) {
         super(data);
     }
 
+    double [] distances;
     @Override
     protected ShortestPathSolution doRun() {
 
@@ -32,8 +30,9 @@ public class BellmanFordAlgorithm extends ShortestPathAlgorithm {
         Graph graph = data.getGraph();
 
         final int nbNodes = graph.size();
-        distances = new double[nbNodes];
+
         // Initialize array of distances.
+        distances = new double[nbNodes];
         Arrays.fill(distances, Double.POSITIVE_INFINITY);
         distances[data.getOrigin().getId()] = 0;
 
@@ -104,9 +103,9 @@ public class BellmanFordAlgorithm extends ShortestPathAlgorithm {
 
         return solution;
     }
-
-	public double[] runMyTests() {
-		return distances;
-	}
+    
+    public double [] runMyTests(){
+    	return distances;
+    }
 
 }
