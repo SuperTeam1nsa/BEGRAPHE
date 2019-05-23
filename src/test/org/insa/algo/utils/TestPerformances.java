@@ -151,31 +151,35 @@ public class TestPerformances {
     System.out.println("nb Pairs " +nbPairs);
     s2.close();
     System.out.println("ID Mode"+ mode);
+    
+    
+    switch(algo)
+    {
+    case (0): 
+    	output.append("BellmanFord");
+    	break; 
+    case (1): 
+    	output.append("Dijkstra");
+    	break; 
+    case (2): 
+    	output.append("Astar");
+    	break; 
+    	            
+    
+    }
+    output.newLine();
     while (sc2.hasNextLine()) {
         s2 = new Scanner(sc2.nextLine());
         ShortestPathAlgorithm algorithm=null;
         ShortestPathSolution solution=null;
         ShortestPathData data=null; 
         
+        
         while (s2.hasNext()) {
             String originid = s2.next();
             String destinationid=s2.next();
             output.append(originid+" "+destinationid+" ");
-            switch(algo)
-            {
-            case (0): 
-            	output.append("BellmanFord");
-            	break; 
-            case (1): 
-            	output.append("Dijkstra");
-            	break; 
-            case (2): 
-            	output.append("Astar");
-            	break; 
-            	            
-            
-            }
-            output.newLine();
+ 
             Node origin=graph.getNodes().get(Integer.parseInt(originid)); 
             Node destination=graph.getNodes().get(Integer.parseInt(destinationid));
             data=new ShortestPathData(graph,origin,destination,ArcInspectorFactory.getAllFilters().get(mode==0?0:2));
@@ -224,7 +228,8 @@ public class TestPerformances {
 
             	}
             	
-            	
+            	output.append(" " +Long.toString(solution.getSolvingTime().getSeconds())+"."+ Long.toString(solution.getSolvingTime().getNano()));
+            	output.append(" "+ Integer.toString(myObserver.getNb_explores()) + " "+ Integer.toString((myObserver.getNb_explores()))+" "+Integer.toString(myObserver.getMax_tas()));
             	
             	
 
@@ -274,7 +279,7 @@ public class TestPerformances {
 	{
 		String carte="insa";
 		createTestFiles(carte,0,30);
-		readTestFiles(".//"+carte+"//"+carte+"_distance_30.txt",1);
+		readTestFiles(".//"+carte+"//"+carte+"_distance_30.txt",2);
 	}
 	
 	
