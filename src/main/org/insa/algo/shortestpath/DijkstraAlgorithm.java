@@ -131,6 +131,10 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
         return solution;
     }
+    
+    public Label[] getMapLabel(){
+    	return map;
+    }
     protected void initLabel(Graph graph) {
     	map=new Label[graph.size()];
     	  //Remplissage du tableau des labels
