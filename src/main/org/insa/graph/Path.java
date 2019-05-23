@@ -314,8 +314,8 @@ public class Path {
      * @return Total length of the path (in meters).
      */
     //un path is oneway != graph
-    public float getLength() {
-    	float distance=0;
+    public double getLength() {
+    	double distance=0;
     	for(Arc a:arcs) {
     		distance+=a.getLength();
     	}

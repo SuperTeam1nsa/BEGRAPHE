@@ -47,7 +47,14 @@ public class TestPerformances {
 	        modetext="temps";	
 	        }
 	        String fileName=carte+"_"+modetext+"_"+Integer.toString(nbPairs)+".txt";
-	       File file = new File(fileName);
+	        File Folder=new File("insa"); 
+	        if (Folder.mkdir())
+	        {
+	        	System.out.println("Folder created");
+	        }
+	        else
+	        {System.out.println("Folder not created");}
+	       File file = new File(".//insa//"+fileName);
 	        try {
 				if(file.createNewFile()){
 				    System.out.println(" File Created in Project root directory");
@@ -58,7 +65,7 @@ public class TestPerformances {
 			}
 	        
 	        BufferedWriter output;
-	        output = new BufferedWriter(new FileWriter(fileName));  
+	        output = new BufferedWriter(new FileWriter(".//insa//"+fileName));  
 	        
 	        output.append(carte); 
 	        output.newLine();
@@ -80,9 +87,9 @@ public class TestPerformances {
 	}
 	void readTestFiles(String fileName) throws IOException
 	{
-		 File file = new File("./");
+		 File file = null;
 
-		 String resultFileName="results_"+fileName;
+		 String resultFileName=fileName.substring(0, fileName.length()-4)+"results.txt";
 	        file = new File(resultFileName);
 	        try {
 				if(file.createNewFile()){
@@ -141,7 +148,7 @@ public class TestPerformances {
 	{
 	
 		createTestFiles("insa",0,50);
-		readTestFiles("insa_distance_50.txt");
+		readTestFiles(".//insa//insa_distance_50.txt");
 	}
 	
 	

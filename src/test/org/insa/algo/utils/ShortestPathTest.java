@@ -11,7 +11,6 @@ import java.io.IOException;
 
 
 import org.insa.algo.ArcInspectorFactory;
-import org.insa.algo.shortestpath.BellmanForTests;
 import org.insa.algo.shortestpath.BellmanFordAlgorithm;
 import org.insa.algo.shortestpath.BinaryHeapObserver;
 import org.insa.algo.shortestpath.DijkstraAlgorithm;
@@ -75,24 +74,71 @@ public class ShortestPathTest {
 		}
 			
 		
+		//@Test
+		public void testexhaustif() {
+			Graph graph=LireGraphe(mapName);
+			int nbnodes=graph.size();
+			int []modes= {0,2};
+			
+			
+			
+			
+			ShortestPathSolution bSolution=null;
+			ShortestPathData d=null;
+
+			ShortestPathData bellmanInput=null;
+			BellmanFordAlgorithm bellRun=null;
+			for (int m=0;m<2;m++)
+			{
+				for (int originid=0;originid<graph.size();originid++)
+				{
+					bellmanInput=new ShortestPathData(graph,graph.getNodes().get(originid),graph.getNodes().get((originid==0)?1:0),ArcInspectorFactory.getAllFilters().get(modes[m]));
+					bellRun=new BellmanFordAlgorithm(bellmanInput);
+					bSolution=bellRun.run();
+					double [] bellmanData=bellRun.runMyTests();
+					DijkstraAlgorithm dij=null;
+					ShortestPathSolution dSolution = null; 
+
+					for (int destinationid=0;destinationid<graph.size();destinationid++)
+					{
+						 
+						if (bellmanData[destinationid]!=Double.POSITIVE_INFINITY & bellmanData[destinationid]!=0.0)
+						{
+							d=new ShortestPathData(graph,graph.getNodes().get(originid),graph.getNodes().get(destinationid),ArcInspectorFactory.getAllFilters().get(modes[m]));
+							dij= new DijkstraAlgorithm(d);
+							dSolution=dij.run();
+							if(modes[m]==0)
+							assertEquals(dSolution.getPath().getLength(),bellmanData[destinationid],epsilon);
+							else
+								assertEquals(dSolution.getPath().getMinimumTravelTime(),bellmanData[destinationid],epsilon);
+
+							
+						}
+						
+					
+					}
+				}
+			}
 		
+			}
 		
 		
 		@Test
-	public void testshortestpath() {
+	public void testshortestpath50noeudsrandom() {
 		Graph graph=LireGraphe(mapName);
 	
 		Node origin=ShortestPathTest.pickNode(graph);
 		
 		
 		
-		
+		ShortestPathSolution bSolution=null;
 		ShortestPathData d=null;
 
-		ShortestPathData bellmanInput=new ShortestPathData(graph,origin,origin,ArcInspectorFactory.getAllFilters().get(0));
-
-		BellmanForTests bellRun=new BellmanForTests(bellmanInput);
+		ShortestPathData bellmanInput=new ShortestPathData(graph,origin,ShortestPathTest.pickNode(graph),ArcInspectorFactory.getAllFilters().get(0));
+		BellmanFordAlgorithm bellRun=new BellmanFordAlgorithm(bellmanInput);
 		System.out.println("id "+Integer.toString( origin.getId()));
+		bSolution=bellRun.run();
+		System.out.println(bSolution.toString());
 
 		double [] bellmanData=bellRun.runMyTests();
 		
@@ -136,7 +182,7 @@ public class ShortestPathTest {
 	
 		}
 		@Test
-		public void testfastesttime() {
+		public void testfastesttime50noeudsrandom() {
 			
 			Graph graph=LireGraphe(mapName);
 			
@@ -146,12 +192,13 @@ public class ShortestPathTest {
 			
 			
 			ShortestPathData d=null;
+			ShortestPathSolution bSolution=null;
 
-			ShortestPathData bellmanInput=new ShortestPathData(graph,origin,origin,ArcInspectorFactory.getAllFilters().get(2));
+			ShortestPathData bellmanInput=new ShortestPathData(graph,origin,ShortestPathTest.pickNode(graph),ArcInspectorFactory.getAllFilters().get(2));
 
-			BellmanForTests bellRun=new BellmanForTests(bellmanInput);
+			BellmanFordAlgorithm bellRun=new BellmanFordAlgorithm(bellmanInput);
 			System.out.println("id "+Integer.toString( origin.getId()));
-
+			bSolution=bellRun.run();
 			double [] bellmanData=bellRun.runMyTests();
 			BinaryHeapObserver myObserver=new BinaryHeapObserver(); 
 			
@@ -177,7 +224,7 @@ public class ShortestPathTest {
 					{
 						d=new ShortestPathData(graph,origin,testNode,ArcInspectorFactory.getAllFilters().get(2));
 						dij= new DijkstraAlgorithm(d);
-						dij.addObserver(myObserver);
+						//dij.addObserver(myObserver);
 
 						dSolution=dij.run();
 						assertEquals(dSolution.getPath().getMinimumTravelTime(),bellmanData[testNode.getId()],epsilon);
