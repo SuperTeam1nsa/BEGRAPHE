@@ -11,6 +11,7 @@ import java.io.IOException;
 
 
 import org.insa.algo.ArcInspectorFactory;
+import org.insa.algo.shortestpath.AStarAlgorithm;
 import org.insa.algo.shortestpath.BellmanFordAlgorithm;
 import org.insa.algo.shortestpath.BinaryHeapObserver;
 import org.insa.algo.shortestpath.DijkstraAlgorithm;
@@ -31,7 +32,7 @@ public class ShortestPathTest {
 		private String pathMapsFolder = "maps/";
 		
 		
-		final private double epsilon = 0.001;
+		final private double epsilon = 10^-5;
 		
 		public static Graph LireGraphe(String filePath) {
   //  JFileChooser chooser = FileUtils.createFileChooser(FolderType.Map);
@@ -61,7 +62,7 @@ public class ShortestPathTest {
 		}
 	
 		
-		public void sameNodeTest(String mapName, int mode) //mode = 0 => Length; mode = 2 => Time
+		public void sameNodeTestDijstra(String mapName, int mode) //mode = 0 => Length; mode = 2 => Time
 		{
 			Graph graph = LireGraphe(pathMapsFolder + mapName);
 			ShortestPathData data;
@@ -139,165 +140,8 @@ public class ShortestPathTest {
 			}
 		
 		
-	
-		public void testShortestPath50NoeudsRandom(String mapName) {
-			
-		Graph graph=LireGraphe(pathMapsFolder + mapName);
-	
-		Node origin=ShortestPathTest.pickNode(graph);
-		
-		
-		
-		ShortestPathSolution bSolution=null;
-		ShortestPathData d=null;
+		public void randomTestDijkstra (String mapName, int nbTest, int mode) {//mode = 0 => Length; mode = 2 => Time
 
-		ShortestPathData bellmanInput=new ShortestPathData(graph,origin,ShortestPathTest.pickNode(graph),ArcInspectorFactory.getAllFilters().get(0));
-		BellmanFordAlgorithm bellRun=new BellmanFordAlgorithm(bellmanInput);
-		System.out.println("id "+Integer.toString( origin.getId())); //???
-		bSolution=bellRun.run();
-		System.out.println(bSolution.toString());
-
-		double [] bellmanData=bellRun.runMyTests();
-		
-		/*
-		for (int i=0;i<graph.size();i++)
-		{
-			
-			System.out.print("id "+Integer.toString( i)+"=");
-
-			System.out.println(Double.toString(bellmanData[i]));
-			
-			
-		}
-		*/
-			Node testNode=null;
-			DijkstraAlgorithm dij=null;
-			ShortestPathSolution dSolution = null; 
-
-			for (int i=0; i<50;i++)
-			{
-				testNode=pickNode(graph); 
-				if (bellmanData[testNode.getId()]!=Double.POSITIVE_INFINITY && bellmanData[testNode.getId()]!=0.0)
-				{
-					d=new ShortestPathData(graph,origin,testNode,ArcInspectorFactory.getAllFilters().get(0));
-					dij= new DijkstraAlgorithm(d);
-					dSolution=dij.run();
-					assertEquals(dSolution.getPath().getLength(),bellmanData[testNode.getId()],epsilon);
-
-
-					
-				}
-				
-				
-				
-			}
-			
-		
-			
-			
-		
-	
-		}
-		
-		
-		private void samePathManyNodeTest(String mapName, int mode) //mode = 0 => Length; mode = 2 => Time
-		{
-			Graph graph = LireGraphe(pathMapsFolder + mapName);
-			ShortestPathData data;
-			
-			BellmanFordAlgorithm bellmanAlgo;
-			ShortestPathSolution bellmanSolution;
-			
-			DijkstraAlgorithm dijkstraAlgo;
-			ShortestPathSolution dijkstraSolution;
-			
-			Node origin=pickNode(graph);
-			Node destination = pickNode(graph);
-			
-			
-			
-			
-			data = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get(mode));
-			
-			bellmanAlgo = new BellmanFordAlgorithm(data);
-			bellmanSolution = bellmanAlgo.run();
-			dijkstraAlgo = new DijkstraAlgorithm(data);
-			dijkstraSolution = dijkstraAlgo.run();
-			
-			Label [] mapDijkstra = dijkstraAlgo.getMapLabel();
-			double [] bellmanCosts = bellmanAlgo.runMyTests();
-			
-			Assume.assumeTrue(mapDijkstra.length == graph.size()); //DijkstraAlgo correspond to the right graph
-			int id;
-			Arc arc = mapDijkstra[data.getDestination().getId()].getFather();
-			
-			while ( arc != null ) {
-				id = arc.getDestination().getId();
-				assertEquals(mapDijkstra[id].getCost(), bellmanCosts[id], epsilon);
-            	arc=mapDijkstra[arc.getOrigin().getId()].getFather();
-            	
-            }
-			
-		}
-		public void testFastestTime50NoeudsRandom(String mapName) {
-
-			
-			
-			Graph graph=LireGraphe(pathMapsFolder + mapName);
-			
-			Node origin=ShortestPathTest.pickNode(graph);
-			
-			
-			
-			
-			ShortestPathData d=null;
-			ShortestPathSolution bSolution=null;
-
-			ShortestPathData bellmanInput=new ShortestPathData(graph,origin,ShortestPathTest.pickNode(graph),ArcInspectorFactory.getAllFilters().get(2));
-
-			BellmanFordAlgorithm bellRun=new BellmanFordAlgorithm(bellmanInput);
-			System.out.println("id "+Integer.toString( origin.getId()));
-			bSolution=bellRun.run();
-			double [] bellmanData=bellRun.runMyTests();
-			BinaryHeapObserver myObserver=new BinaryHeapObserver(); 
-			
-			/*
-			for (int i=0;i<graph.size();i++)
-			{
-				
-				System.out.print("id "+Integer.toString( i)+"=");
-
-				System.out.println(Double.toString(bellmanData[i]));
-				
-				
-			}
-			*/
-				Node testNode=null;
-				DijkstraAlgorithm dij=null;
-				ShortestPathSolution dSolution = null; 
-
-				for (int i=0; i<1;i++)
-				{
-					testNode=pickNode(graph); 
-					if (bellmanData[testNode.getId()]!=Double.POSITIVE_INFINITY & bellmanData[testNode.getId()]!=0.0)
-					{
-						d=new ShortestPathData(graph,origin,testNode,ArcInspectorFactory.getAllFilters().get(2));
-						dij= new DijkstraAlgorithm(d);
-						//dij.addObserver(myObserver);
-
-						dSolution=dij.run();
-						assertEquals(dSolution.getPath().getMinimumTravelTime(),bellmanData[testNode.getId()],epsilon);
-						System.out.println("nb explores= "+Integer.toString(myObserver.getNb_explores())+"nb marques= "+Integer.toString(myObserver.getNb_marques()) +"nb max tas= "+ Integer.toString(myObserver.getMax_tas()));
-
-						
-					}
-					
-					
-					
-				}
-		}
-		
-		public void randomTest(String mapName, int nbTest, int mode) {
 			Graph graph = LireGraphe(pathMapsFolder + mapName);
 			ShortestPathData data;
 			
@@ -312,17 +156,155 @@ public class ShortestPathTest {
 			Node origin;
 			Node destination;
 			
-			for(int i=0; i<nbTest; i++){
-				origin = pickNode(graph);
+			
+			
+			origin = pickNode(graph);
+			destination = pickNode(graph);
+			while(origin.getId() == destination.getId()){
 				destination = pickNode(graph);
+			}
+			
+			data = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get(mode));
+			
+			bellmanAlgo = new BellmanFordAlgorithm(data);
+			bellmanSolution = bellmanAlgo.run();
+			
+			double [] bellmanCosts = bellmanAlgo.runMyTests();
+			
+			double djikstraResult;
+			for(int i=0; i<nbTest; i++){
+			
+				dijkstraAlgo = new DijkstraAlgorithm(data);
+				dijkstraSolution = dijkstraAlgo.run();
+				
+				
+				if(dijkstraSolution.getPath() == null) { // No path found ! The cost is infinity
+					djikstraResult = Double.POSITIVE_INFINITY;
+				}
+				else {
+					if(mode == 0)
+						djikstraResult = dijkstraSolution.getPath().getLength();
+					else
+						djikstraResult = dijkstraSolution.getPath().getMinimumTravelTime();
+				}
+				
+				assertEquals(djikstraResult, bellmanCosts[destination.getId()], epsilon);
+	            
+				destination = pickNode(graph); //Take a new node
+				
 				while(origin.getId() == destination.getId()){
 					destination = pickNode(graph);
 				}
-					
-				data = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get(mode));
 				
-				bellmanAlgo = new BellmanFordAlgorithm(data);
-				bellmanSolution = bellmanAlgo.run();
+				data = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get(mode));	
+				
+			}
+		}
+		
+		
+		
+		public void randomTestAStar (String mapName, int nbTest, int mode) {//mode = 0 => Length; mode = 2 => Time
+
+			Graph graph = LireGraphe(pathMapsFolder + mapName);
+			ShortestPathData data;
+			
+			BellmanFordAlgorithm bellmanAlgo;
+			ShortestPathSolution bellmanSolution;
+			
+			AStarAlgorithm aStarAlgo;
+			ShortestPathSolution aStarSolution;
+			
+			
+			
+			Node origin;
+			Node destination;
+			
+			
+			
+			origin = pickNode(graph);
+			destination = pickNode(graph);
+			while(origin.getId() == destination.getId()){
+				destination = pickNode(graph);
+			}
+			
+			data = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get(mode));
+			
+			bellmanAlgo = new BellmanFordAlgorithm(data);
+			bellmanSolution = bellmanAlgo.run();
+			
+			double [] bellmanCosts = bellmanAlgo.runMyTests();
+			
+			double djikstraResult;
+			for(int i=0; i<nbTest; i++){
+			
+				aStarAlgo = new AStarAlgorithm(data);
+				aStarSolution = aStarAlgo.run();
+				
+				
+				if(aStarSolution.getPath() == null) { // No path found ! The cost is infinity
+					djikstraResult = Double.POSITIVE_INFINITY;
+				}
+				else {
+					if(mode == 0)
+						djikstraResult = aStarSolution.getPath().getLength();
+					else
+						djikstraResult = aStarSolution.getPath().getMinimumTravelTime();
+				}
+				
+				try {
+					assertEquals(djikstraResult, bellmanCosts[destination.getId()], epsilon);
+				}
+				catch(java.lang.AssertionError e) {
+					System.out.println("[ Error on randomTestAStar ] mapName( " + mapName + " ) originId(" + origin.getId() + ")" + " destinationId(" + destination.getId() + ") mode( " + mode + " )");
+					throw e;
+				}
+	            
+				destination = pickNode(graph); //Take a new node
+				
+				while(origin.getId() == destination.getId()){
+					destination = pickNode(graph);
+				}
+				
+				data = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get(mode));	
+				
+			}
+		}
+		
+		
+		
+		
+		public void randomSubpathTestDijkstra(String mapName, int nbTest, int mode) {//mode = 0 => Length; mode = 2 => Time
+			Graph graph = LireGraphe(pathMapsFolder + mapName);
+			ShortestPathData data;
+			
+			BellmanFordAlgorithm bellmanAlgo;
+			ShortestPathSolution bellmanSolution;
+			
+			DijkstraAlgorithm dijkstraAlgo;
+			ShortestPathSolution dijkstraSolution;
+			
+			
+			
+			Node origin;
+			Node destination;
+			
+			
+			
+			origin = pickNode(graph);
+			destination = pickNode(graph);
+			while(origin.getId() == destination.getId()){
+				destination = pickNode(graph);
+			}
+			
+			data = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get(mode));
+			
+			bellmanAlgo = new BellmanFordAlgorithm(data);
+			bellmanSolution = bellmanAlgo.run();
+			
+			int id;
+			
+			for(int i=0; i<nbTest; i++){
+			
 				dijkstraAlgo = new DijkstraAlgorithm(data);
 				dijkstraSolution = dijkstraAlgo.run();
 				
@@ -330,30 +312,106 @@ public class ShortestPathTest {
 				double [] bellmanCosts = bellmanAlgo.runMyTests();
 				
 				Assume.assumeTrue(mapDijkstra.length == graph.size()); //DijkstraAlgo correspond to the right graph
-				int id;
+				
+				
 				Arc arc = mapDijkstra[data.getDestination().getId()].getFather();
 				
 				while ( arc != null ) {
-					id = arc.getDestination().getId();		
+					id = arc.getDestination().getId();
 					assertEquals(mapDijkstra[id].getCost(), bellmanCosts[id], epsilon);
 	            	arc=mapDijkstra[arc.getOrigin().getId()].getFather();
-	            	
 	            }
+				
+				destination = pickNode(graph); //Take a new node
+				
+				while(origin.getId() == destination.getId()){
+					destination = pickNode(graph);
+				}
+				
+				data = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get(mode));	
+				
+			}
+		}
+		
+		
+
+		public void randomSubpathTestAStar(String mapName, int nbTest, int mode) {//mode = 0 => Length; mode = 2 => Time
+			Graph graph = LireGraphe(pathMapsFolder + mapName);
+			ShortestPathData data;
+			
+			BellmanFordAlgorithm bellmanAlgo;
+			ShortestPathSolution bellmanSolution;
+			
+			AStarAlgorithm aStarAlgo;
+			ShortestPathSolution aStarSolution;
+			
+			
+			
+			Node origin;
+			Node destination;
+			
+			
+			
+			origin = pickNode(graph);
+			destination = pickNode(graph);
+			while(origin.getId() == destination.getId()){
+				destination = pickNode(graph);
+			}
+			
+			data = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get(mode));
+			
+			bellmanAlgo = new BellmanFordAlgorithm(data);
+			bellmanSolution = bellmanAlgo.run();
+			
+			int id;
+			
+			for(int i=0; i<nbTest; i++){
+			
+				aStarAlgo = new AStarAlgorithm(data);
+				aStarSolution = aStarAlgo.run();
+				
+				Label [] mapAStar = aStarAlgo.getMapLabel();
+				double [] bellmanCosts = bellmanAlgo.runMyTests();
+				
+				Assume.assumeTrue(mapAStar.length == graph.size()); //AStarAlgo correspond to the right graph
+				
+				
+				Arc arc = mapAStar[data.getDestination().getId()].getFather();
+				
+				while ( arc != null ) {
+					id = arc.getDestination().getId();
+					assertEquals(mapAStar[id].getCost(), bellmanCosts[id], epsilon);
+	            	arc=mapAStar[arc.getOrigin().getId()].getFather();
+	            }
+				
+				destination = pickNode(graph); //Take a new node
+				
+				while(origin.getId() == destination.getId()){
+					destination = pickNode(graph);
+				}
+				
+				data = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get(mode));	
+				
 			}
 		}
 		
 		@Test
-		public void run(){
-			sameNodeTest("insa.mapgr", 0);//LenghtMode
-			sameNodeTest("insa.mapgr", 2);//TimeMode
+		public void randomTestsAStar() {
+			randomTestAStar("insa.mapgr", 10, 0); // Length
+			randomTestAStar("insa.mapgr", 10, 2); // Time
 			
-			samePathManyNodeTest("insa.mapgr", 0);//LenghtMode
-			samePathManyNodeTest("insa.mapgr", 2);//TimetMode
+			randomSubpathTestAStar("insa.mapgr", 10, 2); // Time
+			randomSubpathTestAStar("insa.mapgr", 10, 0); // Length
+		}
+		
+		
+		@Test
+		public void randomTestsDijkstra() {
+			randomTestDijkstra("insa.mapgr", 10, 0); // Length
+			randomTestDijkstra("insa.mapgr", 10, 2); // Time
 			
-			randomTest("insa.mapgr", 10, 0);//LenghtMode
-			randomTest("insa.mapgr", 10, 2);//LenghtMode
-			
-			
+			randomSubpathTestDijkstra("insa.mapgr", 10, 2); // Time
+			randomSubpathTestDijkstra("insa.mapgr", 10, 0); // Length
 		}
 }
 				
