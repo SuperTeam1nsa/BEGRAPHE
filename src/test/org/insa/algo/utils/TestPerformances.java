@@ -89,9 +89,9 @@ public class TestPerformances {
 	        for (int i=0;i<nbPairs;i++)
 	        {
 	        	 int component =(int)(Math.random()*WCCS.getComponents().size());
-	 	         if (WCCS.getComponents().get(component).size()==1)
+	 	         if (WCCS.getComponents().get(component).size()<=50)
 	 	         {
-	 	        	 while (WCCS.getComponents().get(component).size()<=1)
+	 	        	 while (WCCS.getComponents().get(component).size()<=50)
 	 	         
 	 	        	 	{ component =(int)(Math.random()*WCCS.getComponents().size());}
 	 	      	         }
@@ -113,8 +113,25 @@ public class TestPerformances {
 	void readTestFiles(String fileName,int algo) throws IOException
 	{
 		 File file = null;
+		 String resultFileName="";
+		 
+		 switch(algo)
+		    {
+		    case (0): 
+		    	 resultFileName=fileName.substring(0, fileName.length()-4)+"bellman"+"results.txt";
+		    	break; 
+		    case (1): 
+		    	 resultFileName=fileName.substring(0, fileName.length()-4)+"dijkstra"+"results.txt";		
+		    break; 
+		    case (2): 
+		    	 resultFileName=fileName.substring(0, fileName.length()-4)+"astar"+"results.txt";		    
+		    	break; 
+		    	            
+		    
+		    }
+		 
 
-		 String resultFileName=fileName.substring(0, fileName.length()-4)+"results.txt";
+		 
 	        file = new File(resultFileName);
 	        try {
 				if(file.createNewFile()){
@@ -224,12 +241,13 @@ public class TestPerformances {
                 	output.append(Double.toString(solution.getPath().getMinimumTravelTime()));
 
             	}
-            	output.append(" " +Long.toString(solution.getSolvingTime().getSeconds())+"."+ Long.toString(solution.getSolvingTime().getNano()));
-
-            	}
+            	
             	
             	output.append(" " +Long.toString(solution.getSolvingTime().getSeconds())+"."+ Long.toString(solution.getSolvingTime().getNano()));
             	output.append(" "+ Integer.toString(myObserver.getNb_explores()) + " "+ Integer.toString((myObserver.getNb_explores()))+" "+Integer.toString(myObserver.getMax_tas()));
+            	
+            	}
+            	
             	
             	
 
@@ -277,9 +295,27 @@ public class TestPerformances {
 	@Test
 	public void createFiles() throws IOException
 	{
-		String carte="insa";
-		createTestFiles(carte,0,30);
-		readTestFiles(".//"+carte+"//"+carte+"_distance_30.txt",2);
+		String carte="toulouse";
+		int modeInspector=0;
+		int nbPair=30;
+		
+		
+		
+		String modeInspectorString;
+		if (modeInspector==0)
+			modeInspectorString="distance"; 
+		else 
+			modeInspectorString="temps"; 
+		
+		
+		createTestFiles(carte,modeInspector,nbPair);
+		
+		
+		//Dernier parametre: 0 = bellman , 1= dijkstra, 2=astar
+		readTestFiles(".//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",0);
+		readTestFiles(".//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",1);
+		readTestFiles(".//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",2);
+		
 	}
 	
 	
