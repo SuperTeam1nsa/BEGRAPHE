@@ -29,7 +29,7 @@ import org.junit.Test;
 public class ShortestPathTest {
 	
 
-		private String pathMapsFolder = "maps/";
+		private String pathMapsFolder = "./";
 		
 		
 		final private double epsilon = 10^-5;
@@ -404,21 +404,21 @@ public class ShortestPathTest {
 		
 		@Test
 		public void randomTestsAStar() {
-			randomTestAStar("insa.mapgr", 10, 0); // Length
-			randomTestAStar("insa.mapgr", 10, 2); // Time
+			randomTestAStar("toulouse.mapgr", 10, 0); // Length
+			randomTestAStar("toulouse.mapgr", 10, 2); // Time
 			
-			randomSubpathTestAStar("insa.mapgr", 10, 2); // Time
-			randomSubpathTestAStar("insa.mapgr", 10, 0); // Length
+			randomSubpathTestAStar("toulouse.mapgr", 10, 2); // Time
+			randomSubpathTestAStar("toulouse.mapgr", 10, 0); // Length
 		}
 		
 		
 		@Test
 		public void randomTestsDijkstra() {
-			randomTestDijkstra("insa.mapgr", 10, 0); // Length
-			randomTestDijkstra("insa.mapgr", 10, 2); // Time
+			randomTestDijkstra("toulouse.mapgr", 10, 0); // Length
+			randomTestDijkstra("toulouse.mapgr", 10, 2); // Time
 			
-			randomSubpathTestDijkstra("insa.mapgr", 10, 2); // Time
-			randomSubpathTestDijkstra("insa.mapgr", 10, 0); // Length
+			randomSubpathTestDijkstra("toulouse.mapgr", 10, 2); // Time
+			randomSubpathTestDijkstra("toulouse.mapgr", 10, 0); // Length
 		}
 }
 				
