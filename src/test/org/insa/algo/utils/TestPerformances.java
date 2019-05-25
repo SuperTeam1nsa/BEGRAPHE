@@ -37,15 +37,17 @@ import java.util.Scanner;
 
 public class TestPerformances {
 	
+	String mapsPath="./"; 
+	String testResultPath=".//test";
 	Graph graph=null;
 	public void createTestFiles(String carte,int mode, int nbPairs) throws IOException
 	{
-		 graph=ShortestPathTest.LireGraphe("./"+carte+".mapgr");
+		 graph=ShortestPathTest.LireGraphe(mapsPath+carte+".mapgr");
 	    
-		 	 
-		 	WeaklyConnectedComponentsData WCCD=new WeaklyConnectedComponentsData(graph); 
-		 	WeaklyConnectedComponentsAlgorithm WCCA=new WeaklyConnectedComponentsAlgorithm(WCCD);
-		 	WeaklyConnectedComponentsSolution WCCS=WCCA.run();
+			ShortestPathData data;
+
+			AStarAlgorithm aStarAlgo;
+			ShortestPathSolution aStarSolution;
 		 	
 		 	
 		 	
@@ -58,14 +60,21 @@ public class TestPerformances {
 	        modetext="temps";	
 	        }
 	        String fileName=carte+"_"+modetext+"_"+Integer.toString(nbPairs)+".txt";
-	        File Folder=new File(carte); 
+	        File Folder=new File("test"); 
 	        if (Folder.mkdir())
 	        {
 	        	System.out.println("Folder created");
 	        }
 	        else
 	        {System.out.println("Folder not created");}
-	       File file = new File(".//"+carte+"//"+fileName);
+	        File subFolder=new File("./test/"+carte); 
+	        if (subFolder.mkdir())
+	        {
+	        	System.out.println("Folder created");
+	        }
+	        else
+	        {System.out.println("Folder not created");}
+	       File file = new File(testResultPath+"//"+carte+"//"+fileName);
 	        try {
 				if(file.createNewFile()){
 				    System.out.println(" File Created in Project root directory");
@@ -76,7 +85,7 @@ public class TestPerformances {
 			}
 	        
 	        BufferedWriter output;
-	        output = new BufferedWriter(new FileWriter("./"+carte+"//"+fileName));  
+	        output = new BufferedWriter(new FileWriter(testResultPath+"//"+carte+"//"+fileName));  
 	        
 	        output.append(carte); 
 	        output.newLine();
@@ -84,28 +93,32 @@ public class TestPerformances {
 	        output.newLine();
 	        output.append(Integer.toString(nbPairs));
 	        output.newLine();
-	        int node1;
-	        int node2; 
+	        Node origin;
+	        Node destination; 
 	        for (int i=0;i<nbPairs;i++)
 	        {
-	        	 int component =(int)(Math.random()*WCCS.getComponents().size());
-	 	         if (WCCS.getComponents().get(component).size()<=50)
-	 	         {
-	 	        	 while (WCCS.getComponents().get(component).size()<=50)
-	 	         
-	 	        	 	{ component =(int)(Math.random()*WCCS.getComponents().size());}
-	 	      	         }
-	 	         
-	 	         
-	        	 node1=(int)(Math.random()*WCCS.getComponents().get(component).size());
-	 	         while((node2=(int)(Math.random()*WCCS.getComponents().get(component).size()))==node1)
-	 	         {node2=(int)(Math.random()*WCCS.getComponents().get(component).size());}
-	 	         
-	        	output.append(Integer.toString(WCCS.getComponents().get(component).get(node1).getId()));
-	        	output.append(" ");
-	        	output.append(Integer.toString(WCCS.getComponents().get(component).get(node2).getId()));
-	        	output.newLine();
+
+				origin = ShortestPathTest.pickNode(graph);
+				destination = ShortestPathTest.pickNode(graph);
+				while(origin.getId() == destination.getId()){
+					destination = ShortestPathTest.pickNode(graph);
+				}
+				
+				data = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get((mode==0)?0:2));
 	        	
+				aStarAlgo = new AStarAlgorithm(data);
+				aStarSolution = aStarAlgo.run();
+				
+				if (aStarSolution.isFeasible()){
+				output.append(Integer.toString(origin.getId()));
+	        	output.append(" ");
+	        	output.append(Integer.toString(destination.getId()));
+	        	output.newLine();
+				}
+				else
+				{
+					i--;
+				}
 	        }
 	        output.close();
 		
@@ -184,7 +197,14 @@ public class TestPerformances {
     	            
     
     }
+    
     output.newLine();
+    output.append(Integer.toString(graph.size()));
+    output.newLine();
+    output.append(Integer.toString(nbPairs));
+    output.newLine();
+
+    
     while (sc2.hasNextLine()) {
         s2 = new Scanner(sc2.nextLine());
         ShortestPathAlgorithm algorithm=null;
@@ -218,8 +238,13 @@ public class TestPerformances {
                 	output.append(Double.toString(solution.getPath().getMinimumTravelTime()));
 
             	}
-            	output.append(" " +Long.toString(solution.getSolvingTime().getSeconds())+"."+ Long.toString(solution.getSolvingTime().getNano()));
 
+            	String zerosFilling=""; 
+            	for  (int z=0;z<9-(Long.toString(solution.getSolvingTime().getNano())).length();z++)
+            	{
+            		zerosFilling+="0";
+            	}
+            	output.append(" " +Long.toString(solution.getSolvingTime().getSeconds())+"."+zerosFilling+ Long.toString(solution.getSolvingTime().getNano()));
             	}
             	}
             	
@@ -242,8 +267,12 @@ public class TestPerformances {
 
             	}
             	
-            	
-            	output.append(" " +Long.toString(solution.getSolvingTime().getSeconds())+"."+ Long.toString(solution.getSolvingTime().getNano()));
+            	String zerosFilling=""; 
+            	for  (int z=0;z<9-(Long.toString(solution.getSolvingTime().getNano())).length();z++)
+            	{
+            		zerosFilling+="0";
+            	}
+            	output.append(" " +Long.toString(solution.getSolvingTime().getSeconds())+"."+zerosFilling+ Long.toString(solution.getSolvingTime().getNano()));
             	output.append(" "+ Integer.toString(myObserver.getNb_explores()) + " "+ Integer.toString((myObserver.getNb_explores()))+" "+Integer.toString(myObserver.getMax_tas()));
             	
             	}
@@ -268,7 +297,12 @@ public class TestPerformances {
                 	output.append(Double.toString(solution.getPath().getMinimumTravelTime()));
 
             	}
-            	output.append(" " +Long.toString(solution.getSolvingTime().getSeconds())+"."+ Long.toString(solution.getSolvingTime().getNano()));
+            	String zerosFilling=""; 
+            	for  (int z=0;z<9-(Long.toString(solution.getSolvingTime().getNano())).length();z++)
+            	{
+            		zerosFilling+="0";
+            	}
+            	output.append(" " +Long.toString(solution.getSolvingTime().getSeconds())+"."+zerosFilling+ Long.toString(solution.getSolvingTime().getNano()));
             	output.append(" "+ Integer.toString(myObserver.getNb_explores()) + " "+ Integer.toString((myObserver.getNb_explores()))+" "+Integer.toString(myObserver.getMax_tas()));
             	}
             	
@@ -312,9 +346,9 @@ public class TestPerformances {
 		
 		
 		//Dernier parametre: 0 = bellman , 1= dijkstra, 2=astar
-		readTestFiles(".//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",0);
-		readTestFiles(".//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",1);
-		readTestFiles(".//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",2);
+		readTestFiles(testResultPath+"//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",0);
+		readTestFiles(testResultPath+"//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",1);
+		readTestFiles(testResultPath+"//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",2);
 		
 	}
 	
