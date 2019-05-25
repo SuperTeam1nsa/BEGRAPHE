@@ -188,7 +188,13 @@ public class ShortestPathTest {
 						djikstraResult = dijkstraSolution.getPath().getMinimumTravelTime();
 				}
 				
-				assertEquals(djikstraResult, bellmanCosts[destination.getId()], epsilon);
+				try {
+					assertEquals(djikstraResult, bellmanCosts[destination.getId()], epsilon);
+				}
+				catch(java.lang.AssertionError e) {
+					System.out.println("[ Error on randomTestDjikstra ] mapName( " + mapName + " ) originId(" + origin.getId() + ")" + " destinationId(" + destination.getId() + ") mode( " + mode + " )");
+					throw e;
+				}
 	            
 				destination = pickNode(graph); //Take a new node
 				
@@ -381,6 +387,7 @@ public class ShortestPathTest {
 				while ( arc != null ) {
 					id = arc.getDestination().getId();
 					assertEquals(mapAStar[id].getCost(), bellmanCosts[id], epsilon);
+					
 	            	arc=mapAStar[arc.getOrigin().getId()].getFather();
 	            }
 				
