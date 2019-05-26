@@ -35,9 +35,10 @@ import java.io.FileWriter;
 import java.io.Writer;
 import java.util.Scanner;
 
+
 public class TestPerformances {
 	
-	String mapsPath="./"; 
+	String mapsPath="./Maps/"; 
 	String testResultPath=".//test";
 	Graph graph=null;
 	public void createTestFiles(String carte,int mode, int nbPairs) throws IOException
@@ -329,9 +330,14 @@ public class TestPerformances {
 	@Test
 	public void createFiles() throws IOException
 	{
-		String carte="toulouse";
+		  File folder =new File("./Maps");
+		   File[] fileNames = folder.listFiles();
+		   
+		for (File f:fileNames)
+		{String carte=f.getName().substring(0,f.getName().length()-6);
+		System.out.println(carte);
 		int modeInspector=0;
-		int nbPair=30;
+		int nbPair=50;
 		
 		
 		
@@ -349,6 +355,7 @@ public class TestPerformances {
 		readTestFiles(testResultPath+"//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",0);
 		readTestFiles(testResultPath+"//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",1);
 		readTestFiles(testResultPath+"//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",2);
+		}
 		
 	}
 	
