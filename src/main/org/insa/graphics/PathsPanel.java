@@ -313,6 +313,7 @@ public class PathsPanel extends JPanel implements DrawingChangeListener, GraphCh
 
     public void addPath(Path path) {
         try {
+        	if(path!=null)
             this.add(new PathPanel(path, ColorUtils.getColor(this.getComponentCount())));
             this.setVisible(true);
             this.revalidate();
