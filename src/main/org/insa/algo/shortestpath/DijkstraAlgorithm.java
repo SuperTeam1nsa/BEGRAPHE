@@ -17,7 +17,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
     public DijkstraAlgorithm(ShortestPathData data) {
         super(data);
     }
-    protected Label[] map;
+    public Label[] map;
     protected ShortestPathData data;
     @Override
     protected ShortestPathSolution doRun() {
@@ -26,7 +26,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         data = getInputData();
         Graph graph = data.getGraph();
         
-        if (data.getOrigin().getId() == data.getDestination().getId()){
+        if (data.getDestination()!= null && data.getOrigin().getId() == data.getDestination().getId()){
         	return new ShortestPathSolution(data, Status.TRIVIAL);
         }
 
@@ -101,11 +101,11 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                 }
         		
         	}
-        } while( !tas.isEmpty() && labelCurrentNode.getNode().getId()!=data.getDestination().getId());
+        } while( !tas.isEmpty() && (data.getDestination()==null || labelCurrentNode.getNode().getId()!=data.getDestination().getId()));
         ShortestPathSolution solution = null;
 
         // Destination has no predecessor, the solution is infeasible...
-        if (map[data.getDestination().getId()].getFather() == null) {
+        if (data.getDestination()==null || map[data.getDestination().getId()].getFather() == null) {
             solution = new ShortestPathSolution(data, Status.INFEASIBLE);
         }
         else {

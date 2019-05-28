@@ -10,6 +10,7 @@ import java.util.TreeSet;
 import org.insa.algo.shortestpath.AStarAlgorithm;
 import org.insa.algo.shortestpath.BellmanFordAlgorithm;
 import org.insa.algo.shortestpath.DijkstraAlgorithm;
+import org.insa.algo.shortestpath.ProblemeOuvertDeVacances;
 import org.insa.algo.shortestpath.ShortestPathAlgorithm;
 import org.insa.algo.weakconnectivity.WeaklyConnectedComponentsAlgorithm;
 
@@ -29,6 +30,7 @@ public class AlgorithmFactory {
                 WeaklyConnectedComponentsAlgorithm.class);
 
         // Register shortest path algorithm:
+        registerAlgorithm(ShortestPathAlgorithm.class, "Probleme ouvert", ProblemeOuvertDeVacances.class);
         registerAlgorithm(ShortestPathAlgorithm.class, "Bellman-Ford", BellmanFordAlgorithm.class);
         registerAlgorithm(ShortestPathAlgorithm.class, "Dijkstra", DijkstraAlgorithm.class);
         registerAlgorithm(ShortestPathAlgorithm.class, "A*", AStarAlgorithm.class);

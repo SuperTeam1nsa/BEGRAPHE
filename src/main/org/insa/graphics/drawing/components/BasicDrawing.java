@@ -708,7 +708,7 @@ public class BasicDrawing extends JPanel implements Drawing {
     @Override
     public PathOverlay drawPath(Path path, Color color, boolean markers) {
         List<Point> points = new ArrayList<Point>();
-        if (!path.isEmpty()) {
+        if (!(path==null) && !path.isEmpty()) {
             points.add(path.getOrigin().getPoint());
             for (Arc arc: path.getArcs()) {
                 Iterator<Point> itPoint = arc.getPoints().iterator();
@@ -720,7 +720,7 @@ public class BasicDrawing extends JPanel implements Drawing {
             }
         }
         BasicMarkerOverlay origin = null, destination = null;
-        if (markers && !path.isEmpty()) {
+        if (markers && !(path==null) && !path.isEmpty()) {
             origin = createMarker(path.getOrigin().getPoint(), color, color, AlphaMode.TRANSPARENT);
             destination = createMarker(path.getDestination().getPoint(), color, color,
                     AlphaMode.TRANSPARENT);

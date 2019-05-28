@@ -17,9 +17,10 @@ import org.insa.algo.shortestpath.DijkstraAlgorithm;
 import org.insa.algo.shortestpath.ShortestPathAlgorithm;
 import org.insa.algo.shortestpath.ShortestPathData;
 import org.insa.algo.shortestpath.ShortestPathSolution;
-
+import org.insa.graph.Arc;
 import org.insa.graph.Graph;
 import org.insa.graph.Node;
+import org.insa.graph.Path;
 import org.insa.graph.io.BinaryGraphReader;
 //import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,11 +36,17 @@ import java.io.FileWriter;
 import java.io.Writer;
 import java.util.Scanner;
 
+
 public class TestPerformances {
 	
-	String mapsPath="./"; 
+	String mapsPath="./Maps/"; 
 	String testResultPath=".//test";
 	Graph graph=null;
+	
+	
+	
+	
+
 	public void createTestFiles(String carte,int mode, int nbPairs) throws IOException
 	{
 		 graph=ShortestPathTest.LireGraphe(mapsPath+carte+".mapgr");
@@ -220,14 +227,17 @@ public class TestPerformances {
             Node origin=graph.getNodes().get(Integer.parseInt(originid)); 
             Node destination=graph.getNodes().get(Integer.parseInt(destinationid));
             data=new ShortestPathData(graph,origin,destination,ArcInspectorFactory.getAllFilters().get(mode==0?0:2));
-			BinaryHeapObserver myObserver=new BinaryHeapObserver(); 
 
             
             
             if (algo==0)
-            {
+            {	
+            	
+    			BinaryHeapObserver myObserver=new BinaryHeapObserver(); 
+
             	algorithm=new BellmanFordAlgorithm (data);
             	solution=algorithm.run();
+          
             	if (solution.getStatus()==Status.OPTIMAL) 
             	{if (mode==0)
             	{
@@ -238,24 +248,32 @@ public class TestPerformances {
                 	output.append(Double.toString(solution.getPath().getMinimumTravelTime()));
 
             	}
-
+            	/*
             	String zerosFilling=""; 
             	for  (int z=0;z<9-(Long.toString(solution.getSolvingTime().getNano())).length();z++)
             	{
             		zerosFilling+="0";
             	}
             	output.append(" " +Long.toString(solution.getSolvingTime().getSeconds())+"."+zerosFilling+ Long.toString(solution.getSolvingTime().getNano()));
+            	
+            	*/
+            	output.append(" " +Long.toString(solution.getSolvingTime().toNanos()));
+            	output.append(" "+Integer.toString(solution.getPath().getArcs().size()));
+            	
             	}
             	}
             	
-            	
+        
             
             else if (algo==1)
-            {
+            {	
+            	
+    			BinaryHeapObserver myObserver=new BinaryHeapObserver(); 
+
             	algorithm=new DijkstraAlgorithm (data);
             	algorithm.addObserver(myObserver);
-            	
             	solution=algorithm.run();
+         
             	if (solution.getStatus()==Status.OPTIMAL) 
             	{if (mode==0)
             	{
@@ -267,26 +285,30 @@ public class TestPerformances {
 
             	}
             	
+            	/*
             	String zerosFilling=""; 
             	for  (int z=0;z<9-(Long.toString(solution.getSolvingTime().getNano())).length();z++)
             	{
             		zerosFilling+="0";
             	}
             	output.append(" " +Long.toString(solution.getSolvingTime().getSeconds())+"."+zerosFilling+ Long.toString(solution.getSolvingTime().getNano()));
+            	
+            	*/
+            	output.append(" " +Long.toString(solution.getSolvingTime().toNanos()));
             	output.append(" "+ Integer.toString(myObserver.getNb_explores()) + " "+ Integer.toString((myObserver.getNb_explores()))+" "+Integer.toString(myObserver.getMax_tas()));
+            	output.append(" "+Integer.toString(solution.getPath().getArcs().size()));
             	
             	}
-            	
-            	
-            	
 
             }
             else if (algo==2)
             {
-            	
+    			BinaryHeapObserver myObserver=new BinaryHeapObserver(); 
+
             	algorithm=new AStarAlgorithm (data);
             	algorithm.addObserver(myObserver);
             	solution=algorithm.run();
+            	
             	if (solution.getStatus()==Status.OPTIMAL) 
             	{if (mode==0)
             	{
@@ -297,24 +319,28 @@ public class TestPerformances {
                 	output.append(Double.toString(solution.getPath().getMinimumTravelTime()));
 
             	}
+            	/*
             	String zerosFilling=""; 
             	for  (int z=0;z<9-(Long.toString(solution.getSolvingTime().getNano())).length();z++)
             	{
             		zerosFilling+="0";
             	}
             	output.append(" " +Long.toString(solution.getSolvingTime().getSeconds())+"."+zerosFilling+ Long.toString(solution.getSolvingTime().getNano()));
+            	
+            	*/
+            	output.append(" " +Long.toString(solution.getSolvingTime().toNanos()));
             	output.append(" "+ Integer.toString(myObserver.getNb_explores()) + " "+ Integer.toString((myObserver.getNb_explores()))+" "+Integer.toString(myObserver.getMax_tas()));
-            	}
-            	
-            	
+            	output.append(" "+Integer.toString(solution.getPath().getArcs().size()));
             		
-
+            	}
             }
             	
             
             
         }
         output.newLine();
+        algorithm=null; 
+        System.gc();
     }
     output.close();
     s2.close();
@@ -329,9 +355,14 @@ public class TestPerformances {
 	@Test
 	public void createFiles() throws IOException
 	{
-		String carte="toulouse";
+		  File folder =new File("./Maps");
+		   File[] fileNames = folder.listFiles();
+		   
+		for (File f:fileNames)
+		{String carte=f.getName().substring(0,f.getName().length()-6);
+		System.out.println(carte);
 		int modeInspector=0;
-		int nbPair=30;
+		int nbPair=200;
 		
 		
 		
@@ -349,6 +380,17 @@ public class TestPerformances {
 		readTestFiles(testResultPath+"//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",0);
 		readTestFiles(testResultPath+"//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",1);
 		readTestFiles(testResultPath+"//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",2);
+		
+		modeInspector=1;
+		if (modeInspector==0)
+			modeInspectorString="distance"; 
+		else 
+			modeInspectorString="temps"; 
+		
+		readTestFiles(testResultPath+"//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",0);
+		readTestFiles(testResultPath+"//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",1);
+		readTestFiles(testResultPath+"//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",2);
+		}
 		
 	}
 	
