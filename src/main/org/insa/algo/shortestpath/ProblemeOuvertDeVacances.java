@@ -55,14 +55,12 @@ public class ProblemeOuvertDeVacances extends ShortestPathAlgorithm{
 		ArrayList<Node> nodes01 =new ArrayList<Node>();
 		ArrayList<Node> nodes02 =new ArrayList<Node>();
 		double currentDistance,currentdistanceBis;
-		Node current=O1;
 		notifyOriginProcessed(data.getOrigin());
-		nodesEnCours.push(O1);
 		Node good;
 		AStarAlgorithm aStarAlgo;
-		ShortestPathSolution aStarSolution;
+		ShortestPathSolution o1Solution;
 		
-		double distance = Point.distance(O1.getPoint(), O2.getPoint()); //version 0102 à vol d'oiseau, sinon A star pour trouver la distance réel
+		///double distance = Point.distance(O1.getPoint(), O2.getPoint()); //version 0102 à vol d'oiseau, sinon A star pour trouver la distance réel
 		//selon compréhension des données du problème
 		//version A star
 		/*data=new ShortestPathData(graph, O1, O2, ArcInspectorFactory.getAllFilters().get(0));//0=distance
@@ -70,14 +68,29 @@ public class ProblemeOuvertDeVacances extends ShortestPathAlgorithm{
 		aStarSolution = aStarAlgo.run();
 		double distance = aStarSolution.getCost();*/
 		
+		//depuis 01 en distance
+		data=new ShortestPathData(graph, O1, null, ArcInspectorFactory.getAllFilters().get(0));//0=distance
+		DijkstraAlgorithm dijAlgo1 = new DijkstraAlgorithm(data);
+		o1Solution = dijAlgo1.run();
+		double distance = dijAlgo1.map[O2.getId()].getCost();
+		
+		//depuis 02 en distance
+				data=new ShortestPathData(graph, O2, null, ArcInspectorFactory.getAllFilters().get(0));//0=distance
+				DijkstraAlgorithm dijAlgo2 = new DijkstraAlgorithm(data);
+				o1Solution = dijAlgo2.run();
+		
+				Node current=O1;
+				nodesEnCours.push(O1);
 		while(!nodesEnCours.isEmpty()) {
 			current=nodesEnCours.pop();
 			nodesDone.add(current);
 			// notifyNodeReached(current);
 			//notifyNodeMarked(current);
 			for(Arc i : current.getSuccessors()) {
-				currentDistance=Point.distance(i.getDestination().getPoint(), O1.getPoint());
-				currentdistanceBis=Point.distance(i.getDestination().getPoint(), O2.getPoint());
+				currentDistance=dijAlgo1.map[i.getDestination().getId()].getCost();
+				currentdistanceBis=dijAlgo2.map[i.getDestination().getId()].getCost();
+				//currentDistance=Point.distance(i.getDestination().getPoint(), O1.getPoint());
+				//currentdistanceBis=Point.distance(i.getDestination().getPoint(), O2.getPoint());
 				if(currentDistance< distance && currentdistanceBis <distance && !nodesDone.contains(i.getDestination()))
 				{
 					good=i.getDestination();
@@ -93,18 +106,22 @@ public class ProblemeOuvertDeVacances extends ShortestPathAlgorithm{
 		}
 		
 		System.out.println(" Il y a "+nodes01.size()+" neuds ok pour la distance");
-
+		
+		//depuis 01 en temps
+				data=new ShortestPathData(graph, O1, null, ArcInspectorFactory.getAllFilters().get(2));
+				dijAlgo1 = new DijkstraAlgorithm(data);
+				o1Solution = dijAlgo1.run();
+				
+				//depuis 02 en temps
+						data=new ShortestPathData(graph, O2, null, ArcInspectorFactory.getAllFilters().get(2));
+						dijAlgo2 = new DijkstraAlgorithm(data);
+						o1Solution = dijAlgo2.run();
+						
 		double tempsO1M,tempsO2M;
 		Node goodone;
 		for(Node i:nodes01) {
-			data=new ShortestPathData(graph, i, O1, ArcInspectorFactory.getAllFilters().get(2));//2=time and car
-			aStarAlgo = new AStarAlgorithm(data);
-			aStarSolution = aStarAlgo.run();
-			tempsO1M = aStarSolution.getCost();
-			data=new ShortestPathData(graph, i, O2, ArcInspectorFactory.getAllFilters().get(2));//2=time and car
-			aStarAlgo = new AStarAlgorithm(data);
-			aStarSolution = aStarAlgo.run();
-			tempsO2M = aStarSolution.getCost();
+			tempsO1M = dijAlgo1.map[i.getId()].getCost();
+			tempsO2M = dijAlgo2.map[i.getId()].getCost();
 			if(Math.abs((tempsO2M-tempsO1M))<tolerance_time*Math.min(tempsO2M, tempsO1M)) {
 				goodone=i;
 				nodes02.add(goodone);
@@ -114,6 +131,8 @@ public class ProblemeOuvertDeVacances extends ShortestPathAlgorithm{
 				
 		}
 		System.out.println(" Il y a "+nodes02.size()+" neuds ok en tout");
+		
+		data=new ShortestPathData(graph, O2, O1, ArcInspectorFactory.getAllFilters().get(0));
 		return new ShortestPathSolution(data, Status.TRIVIAL);
 		
 	}
