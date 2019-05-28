@@ -9,7 +9,7 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-
+import org.insa.algo.AbstractSolution.Status;
 import org.insa.algo.ArcInspectorFactory;
 import org.insa.algo.shortestpath.AStarAlgorithm;
 import org.insa.algo.shortestpath.BellmanFordAlgorithm;
@@ -18,6 +18,9 @@ import org.insa.algo.shortestpath.DijkstraAlgorithm;
 import org.insa.algo.shortestpath.Label;
 import org.insa.algo.shortestpath.ShortestPathData;
 import org.insa.algo.shortestpath.ShortestPathSolution;
+import org.insa.algo.weakconnectivity.WeaklyConnectedComponentsAlgorithm;
+import org.insa.algo.weakconnectivity.WeaklyConnectedComponentsData;
+import org.insa.algo.weakconnectivity.WeaklyConnectedComponentsSolution;
 import org.insa.graph.Arc;
 import org.insa.graph.Graph;
 import org.insa.graph.Node;
@@ -29,7 +32,7 @@ import org.junit.Test;
 public class ShortestPathTest {
 	
 
-		private String pathMapsFolder = "./";
+		private String pathMapsFolder = "maps/";
 		
 		
 		final private double epsilon = 10^-5;
@@ -43,7 +46,7 @@ public class ShortestPathTest {
 	            stream = new DataInputStream(new BufferedInputStream(new FileInputStream(filePath)));
 	        }
 	        catch (IOException e1) {
-	            System.out.println("Cannot open the selected file.");
+	            System.out.println("No file found at " + filePath);
 	            return null;
 	        }
 	        
@@ -240,7 +243,7 @@ public class ShortestPathTest {
 			
 			double [] bellmanCosts = bellmanAlgo.runMyTests();
 			
-			double djikstraResult;
+			double aStarResult;
 			for(int i=0; i<nbTest; i++){
 			
 				aStarAlgo = new AStarAlgorithm(data);
@@ -248,17 +251,17 @@ public class ShortestPathTest {
 				
 				
 				if(aStarSolution.getPath() == null) { // No path found ! The cost is infinity
-					djikstraResult = Double.POSITIVE_INFINITY;
+					aStarResult = Double.POSITIVE_INFINITY;
 				}
 				else {
 					if(mode == 0)
-						djikstraResult = aStarSolution.getPath().getLength();
+						aStarResult = aStarSolution.getPath().getLength();
 					else
-						djikstraResult = aStarSolution.getPath().getMinimumTravelTime();
+						aStarResult = aStarSolution.getPath().getMinimumTravelTime();
 				}
 				
 				try {
-					assertEquals(djikstraResult, bellmanCosts[destination.getId()], epsilon);
+					assertEquals(aStarResult, bellmanCosts[destination.getId()], epsilon);
 				}
 				catch(java.lang.AssertionError e) {
 					System.out.println("[ Error on randomTestAStar ] mapName( " + mapName + " ) originId(" + origin.getId() + ")" + " destinationId(" + destination.getId() + ") mode( " + mode + " )");
@@ -402,24 +405,160 @@ public class ShortestPathTest {
 			}
 		}
 		
+		
+		public void randomNoPathTestAStar(String mapName) {
+			Graph graph = LireGraphe(pathMapsFolder + mapName);
+			WeaklyConnectedComponentsData dataWeakConn;
+			ShortestPathData dataShortest;
+			
+			BellmanFordAlgorithm bellmanAlgo;
+			ShortestPathSolution bellmanSolution;
+			WeaklyConnectedComponentsSolution weakConnSolution;
+			
+			AStarAlgorithm aStarAlgo;
+			ShortestPathSolution aStarSolution;
+			
+			
+			int nbComponent;
+			
+			Node origin;
+			Node destination;
+			
+			dataWeakConn = new WeaklyConnectedComponentsData(graph);
+			
+			WeaklyConnectedComponentsAlgorithm weakConnAlgo = new WeaklyConnectedComponentsAlgorithm(dataWeakConn);
+			
+			weakConnSolution = weakConnAlgo.run(2);
+			
+			nbComponent = weakConnSolution.getComponents().size();
+			
+			if(nbComponent == 1)
+			{
+				System.out.println("< " + mapName + " > is one connected component !");
+			}
+			/*else
+			{
+				System.out.println(nbComponent + " = nbComponent found !");
+			}*/
+			
+			
+			Assume.assumeTrue(nbComponent == 2);
+		
+			int randomId = (int) Math.random()*weakConnSolution.getComponents().get(0).size();
+			origin = weakConnSolution.getComponents().get(0).get(randomId);
+			randomId = (int) Math.random()*weakConnSolution.getComponents().get(1).size();
+			destination = weakConnSolution.getComponents().get(1).get(randomId);
+			
+			System.out.println( origin.getId() + " to " + destination.getId() + " on map " + mapName + " have not any path between");
+			
+			dataShortest = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get(0));
+		
+			bellmanAlgo = new BellmanFordAlgorithm(dataShortest);
+			bellmanSolution = bellmanAlgo.run();
+			
+			double [] bellmanCosts = bellmanAlgo.runMyTests();
+			
+			Assume.assumeTrue("A path is found, weaklyComponentClass does not work !", bellmanCosts[destination.getId()] == Double.POSITIVE_INFINITY);
+					
+			
+			aStarAlgo = new AStarAlgorithm(dataShortest);
+			aStarSolution = aStarAlgo.run();
+			
+			assertEquals(aStarSolution.getPath(), null);		
+		
+		}
+		
+		
+		public void randomNoPathTestDijkstra(String mapName) {
+			Graph graph = LireGraphe(pathMapsFolder + mapName);
+			WeaklyConnectedComponentsData dataWeakConn;
+			ShortestPathData dataShortest;
+			
+			BellmanFordAlgorithm bellmanAlgo;
+			ShortestPathSolution bellmanSolution;
+			WeaklyConnectedComponentsSolution weakConnSolution;
+			
+			DijkstraAlgorithm dijkstraAlgo;
+			ShortestPathSolution dijkstraSolution;
+			
+			
+			int nbComponent;
+			
+			Node origin;
+			Node destination;
+			
+			dataWeakConn = new WeaklyConnectedComponentsData(graph);
+			
+			WeaklyConnectedComponentsAlgorithm weakConnAlgo = new WeaklyConnectedComponentsAlgorithm(dataWeakConn);
+			
+			weakConnSolution = weakConnAlgo.run(2);
+			
+			nbComponent = weakConnSolution.getComponents().size();
+			
+			if(nbComponent == 1)
+			{
+				System.out.println("< " + mapName + " > is one connected component !");
+			}
+			/*else
+			{
+				System.out.println(nbComponent + " = nbComponent found !");
+			}*/
+			
+			
+			Assume.assumeTrue(nbComponent == 2);
+		
+			int randomId = (int) Math.random()*weakConnSolution.getComponents().get(0).size();
+			origin = weakConnSolution.getComponents().get(0).get(randomId);
+			randomId = (int) Math.random()*weakConnSolution.getComponents().get(1).size();
+			destination = weakConnSolution.getComponents().get(1).get(randomId);
+			
+			System.out.println( origin.getId() + " to " + destination.getId() + " on map " + mapName + " have not any path between");
+			
+			dataShortest = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get(0));
+		
+			bellmanAlgo = new BellmanFordAlgorithm(dataShortest);
+			bellmanSolution = bellmanAlgo.run();
+			
+			double [] bellmanCosts = bellmanAlgo.runMyTests();
+			
+			Assume.assumeTrue("A path is found, weaklyComponentClass does not work !", bellmanCosts[destination.getId()] == Double.POSITIVE_INFINITY);
+					
+			
+			dijkstraAlgo = new DijkstraAlgorithm(dataShortest);
+			dijkstraSolution = dijkstraAlgo.run();
+			
+			assertEquals(dijkstraSolution.getPath(), null);		
+		
+		}
+		
 		@Test
 		public void randomTestsAStar() {
-			randomTestAStar("toulouse.mapgr", 10, 0); // Length
-			randomTestAStar("toulouse.mapgr", 10, 2); // Time
+			//randomTestAStar(".mapgr", 10, 0); // Length
+			//randomTestAStar("toulouse.mapgr", 10, 2); // Time
 			
-			randomSubpathTestAStar("toulouse.mapgr", 10, 2); // Time
-			randomSubpathTestAStar("toulouse.mapgr", 10, 0); // Length
+			//randomSubpathTestAStar("toulouse.mapgr", 10, 2); // Time
+			//randomSubpathTestAStar("toulouse.mapgr", 10, 0); // Length
+			
+			//randomNoPathTestAStar("fractal.mapgr");
+			randomNoPathTestAStar("benin.mapgr");
+			randomNoPathTestAStar("insa.mapgr");
+			
 		}
 		
 		
 		@Test
 		public void randomTestsDijkstra() {
-			randomTestDijkstra("toulouse.mapgr", 10, 0); // Length
+			/*randomTestDijkstra("toulouse.mapgr", 10, 0); // Length
 			randomTestDijkstra("toulouse.mapgr", 10, 2); // Time
 			
 			randomSubpathTestDijkstra("toulouse.mapgr", 10, 2); // Time
-			randomSubpathTestDijkstra("toulouse.mapgr", 10, 0); // Length
+			randomSubpathTestDijkstra("toulouse.mapgr", 10, 0); // Length*/
+			randomNoPathTestDijkstra("benin.mapgr");
+			randomNoPathTestDijkstra("insa.mapgr");
 		}
+		
+		
+		
 }
 				
 	   

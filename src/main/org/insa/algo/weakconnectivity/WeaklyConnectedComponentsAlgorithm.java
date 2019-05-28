@@ -155,5 +155,47 @@ public class WeaklyConnectedComponentsAlgorithm
 
         return new WeaklyConnectedComponentsSolution(getInputData(), Status.OPTIMAL, components);
     }
+    /*
+     * This function allows to specify the number of component that we want.
+     * To have all the component of the graph you have to give -1 as parameter
+     * The solution of this this function does not provide the solution time called SolvingTime
+     */
+    
+    public WeaklyConnectedComponentsSolution run(int numberOfComponent) {
+    	
+    	
+        Graph graph = getInputData().getGraph();
+        ArrayList<HashSet<Integer>> ugraph = createUndirectedGraph();
+        boolean[] marked = new boolean[graph.size()];
+        Arrays.fill(marked, false);
+
+        ArrayList<ArrayList<Node>> components = new ArrayList<ArrayList<Node>>();
+
+        // perform algorithm
+        int cur = 0;
+        int nbIteration, cmpter=0;
+        
+        
+        if(numberOfComponent == -1 || numberOfComponent > marked.length){
+        	nbIteration = marked.length; // We take all of them
+        }
+        else
+        {
+        	nbIteration = numberOfComponent;
+        }
+        
+        while (cur < marked.length && cmpter < nbIteration) {
+            // Apply BFS
+            components.add(this.bfs(ugraph, marked, cur));
+            cmpter++;
+
+            // Find next non-marked
+            for (; cur < marked.length && marked[cur]; ++cur)
+                ;
+        }
+       
+        return new WeaklyConnectedComponentsSolution(getInputData(), Status.OPTIMAL, components);
+    }
+
 
 }
