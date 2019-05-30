@@ -285,7 +285,7 @@ public class TestPerformances {
             	/* 
             	  utilisation de l'observer pour récuperer les informations qui'il a récupéré (nb explorés, marqués et nb d'éléments max du tas) 
             	 */
-            	output.append(" "+ Integer.toString(myObserver.getNb_explores()) + " "+ Integer.toString((myObserver.getNb_explores()))+" "+Integer.toString(myObserver.getMax_tas())); 
+            	output.append(" "+ Integer.toString(myObserver.getNb_explores()) + " "+ Integer.toString((myObserver.getNb_marques()))+" "+Integer.toString(myObserver.getMax_tas())); 
             	
             	
             	output.append(" "+Integer.toString(solution.getPath().getArcs().size())); // nb noeuds-1 
@@ -319,7 +319,7 @@ public class TestPerformances {
             	/* 
            	  utilisation de l'observer pour récuperer les informations qui'il a récupéré (nb explorés, marqués et nb d'éléments max du tas) 
            	 */
-            	output.append(" "+ Integer.toString(myObserver.getNb_explores()) + " "+ Integer.toString((myObserver.getNb_explores()))+" "+Integer.toString(myObserver.getMax_tas()));
+            	output.append(" "+ Integer.toString(myObserver.getNb_explores()) + " "+ Integer.toString((myObserver.getNb_marques()))+" "+Integer.toString(myObserver.getMax_tas()));
             	output.append(" "+Integer.toString(solution.getPath().getArcs().size())); // nb noeuds-1  
             	output.append(" " +Long.toString(algorithm.getInitTime()));  //utilisation de la méthode (implémentée par nous) pour récuperer le temps d'initialisation des labels
             	output.append(" " +Long.toString(algorithm.getCalculationTime()));  //utilisation de la méthode (implémentée par nous) pour récuperer le temps de calcul 
