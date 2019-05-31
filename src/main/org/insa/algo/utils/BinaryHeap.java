@@ -196,7 +196,37 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
         this.percolateDown(0);
         return minItem;
     }
-
+    
+    public boolean isValid() {
+    	boolean result = true;
+    	recursiveIsValid(0, result);
+    	return result;
+    }
+    
+    private void recursiveIsValid(int index, boolean result){
+    	int ileft = index_left(index);
+    	if(ileft < this.currentSize){
+    		E eleft = this.array.get(ileft), e = this.array.get(index);
+    		if(eleft.compareTo(e) < 0){
+    			 result = false;
+    		}
+    		else 
+    		{
+    			int iright = ileft+1;
+    			if(iright < this.currentSize){
+    				E eright = this.array.get(iright);
+    	    		if(eright.compareTo(e) < 0){
+    	    			 result = false;
+    	    		}
+    	    		else
+    	    		{
+    	    			recursiveIsValid(iright, result);
+    	    		}
+    			}
+    			recursiveIsValid(ileft, result);
+    		}
+		}
+    }
     /**
      * Prints the heap
      */

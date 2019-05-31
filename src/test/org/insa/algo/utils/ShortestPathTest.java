@@ -1,7 +1,7 @@
 package org.insa.algo.utils;
 
+
 import static org.junit.Assert.assertEquals;
-import org.insa.graph.GraphStatistics;
 
 
 import java.io.BufferedInputStream;
@@ -9,19 +9,17 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import org.insa.algo.AbstractSolution.Status;
+
 import org.insa.algo.ArcInspectorFactory;
 import org.insa.algo.shortestpath.AStarAlgorithm;
 import org.insa.algo.shortestpath.BellmanFordAlgorithm;
-import org.insa.algo.shortestpath.BinaryHeapObserver;
 import org.insa.algo.shortestpath.DijkstraAlgorithm;
-import org.insa.algo.shortestpath.Label;
 import org.insa.algo.shortestpath.ShortestPathData;
 import org.insa.algo.shortestpath.ShortestPathSolution;
+import org.insa.algo.shortestpath.ShortestPathTestObserver;
 import org.insa.algo.weakconnectivity.WeaklyConnectedComponentsAlgorithm;
 import org.insa.algo.weakconnectivity.WeaklyConnectedComponentsData;
 import org.insa.algo.weakconnectivity.WeaklyConnectedComponentsSolution;
-import org.insa.graph.Arc;
 import org.insa.graph.Graph;
 import org.insa.graph.Node;
 import org.insa.graph.io.BinaryGraphReader;
@@ -53,22 +51,34 @@ public class ShortestPathTest {
 	        try {
 				return new BinaryGraphReader(stream).read();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return null;
 			}
         
 		}
 		
+		
+		// nature=1 <=> pseudorandom; nature=0 <=> random
+		public static Node pickNode(Graph graph, int nature) {
+			if(nature == 1)
+				return graph.get(PseudoRandom.generate(graph.size()));
+			else
+				return graph.get((int)(Math.random()*(graph.size())));
+
+		}
+		
+		
 		public static Node pickNode(Graph graph) {
 			return graph.get((int)(Math.random()*(graph.size())));
 		}
 	
-		
-		public void sameNodeTestDijstra(String mapName, int mode) //mode = 0 => Length; mode = 2 => Time
+		// nature=1 <=> pseudorandom; nature=0 <=> random
+		//mode = 0 => Length; mode = 2 => Time
+		public void sameNodeTestDijstra(String mapName, int mode, int nature) 
 		{
 			Graph graph = LireGraphe(pathMapsFolder + mapName);
 			ShortestPathData data;
+			ShortestPathTestObserver observer = new ShortestPathTestObserver();
 			
 			BellmanFordAlgorithm bellmanAlgo;
 			ShortestPathSolution bellmanSolution;
@@ -76,33 +86,30 @@ public class ShortestPathTest {
 			DijkstraAlgorithm dijkstraAlgo;
 			ShortestPathSolution dijkstraSolution;
 			
-			Node origin_destination=pickNode(graph);
+			
+			
+			Node origin_destination=pickNode(graph, nature);
 			data = new ShortestPathData(graph, origin_destination, origin_destination, ArcInspectorFactory.getAllFilters().get(mode));
 			
 			bellmanAlgo = new BellmanFordAlgorithm(data);
 			bellmanSolution=bellmanAlgo.run();
 			
 			dijkstraAlgo = new DijkstraAlgorithm(data);
+			dijkstraAlgo.addObserver(observer);
 			dijkstraSolution = dijkstraAlgo.run();
 			
-			//To remove
-			/*System.out.println(dijkstraSolution.toString());
-			System.out.println(bellmanSolution.toString());*/
+			assertEquals(observer.isGrowingCost(), true);
+			assertEquals(dijkstraSolution.getPath().isValid(), true);
 			
 			assertEquals(dijkstraSolution.getCost(), bellmanSolution.getCost(), epsilon);
 			
 		}
 			
 		
-		//@Test
-		public void testexhaustif(String mapName) {
+		public void exhaustiveTestDijkstra(String mapName) {
 			Graph graph=LireGraphe(pathMapsFolder + mapName);
-			int nbnodes=graph.size();
 			int []modes= {0,2};
-			
-			
-			
-			
+		
 			ShortestPathSolution bSolution=null;
 			ShortestPathData d=null;
 
@@ -115,7 +122,7 @@ public class ShortestPathTest {
 					bellmanInput=new ShortestPathData(graph,graph.getNodes().get(originid),graph.getNodes().get((originid==0)?1:0),ArcInspectorFactory.getAllFilters().get(modes[m]));
 					bellRun=new BellmanFordAlgorithm(bellmanInput);
 					bSolution=bellRun.run();
-					double [] bellmanData=bellRun.runMyTests();
+					double [] bellmanData=bellRun.getArraySolution();
 					DijkstraAlgorithm dij=null;
 					ShortestPathSolution dSolution = null; 
 
@@ -143,8 +150,10 @@ public class ShortestPathTest {
 			}
 		
 		
-		public void randomTestDijkstra (String mapName, int nbTest, int mode) {//mode = 0 => Length; mode = 2 => Time
-
+		// nature=1 <=> pseudorandom; nature=0 <=> random
+		//mode = 0 => Length; mode = 2 => Time
+		public void randomTestDijkstra (String mapName, int nbTest, int mode, int nature) {
+			
 			Graph graph = LireGraphe(pathMapsFolder + mapName);
 			ShortestPathData data;
 			
@@ -154,17 +163,19 @@ public class ShortestPathTest {
 			DijkstraAlgorithm dijkstraAlgo;
 			ShortestPathSolution dijkstraSolution;
 			
-			
+			ShortestPathTestObserver observer = new ShortestPathTestObserver();
 			
 			Node origin;
 			Node destination;
 			
+			if(nature == 1){
+				PseudoRandom.initSequence();
+			}
 			
-			
-			origin = pickNode(graph);
-			destination = pickNode(graph);
+			origin = pickNode(graph, nature);
+			destination = pickNode(graph, nature);
 			while(origin.getId() == destination.getId()){
-				destination = pickNode(graph);
+				destination = pickNode(graph, nature);
 			}
 			
 			data = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get(mode));
@@ -172,12 +183,13 @@ public class ShortestPathTest {
 			bellmanAlgo = new BellmanFordAlgorithm(data);
 			bellmanSolution = bellmanAlgo.run();
 			
-			double [] bellmanCosts = bellmanAlgo.runMyTests();
+			double [] bellmanCosts = bellmanAlgo.getArraySolution();
 			
 			double djikstraResult;
 			for(int i=0; i<nbTest; i++){
 			
 				dijkstraAlgo = new DijkstraAlgorithm(data);
+				dijkstraAlgo.addObserver(observer);
 				dijkstraSolution = dijkstraAlgo.run();
 				
 				
@@ -189,9 +201,12 @@ public class ShortestPathTest {
 						djikstraResult = dijkstraSolution.getPath().getLength();
 					else
 						djikstraResult = dijkstraSolution.getPath().getMinimumTravelTime();
+					
+					assertEquals(dijkstraSolution.getPath().isValid(), true);
 				}
 				
 				try {
+					assertEquals(observer.isGrowingCost(), true);
 					assertEquals(djikstraResult, bellmanCosts[destination.getId()], epsilon);
 				}
 				catch(java.lang.AssertionError e) {
@@ -199,20 +214,21 @@ public class ShortestPathTest {
 					throw e;
 				}
 	            
-				destination = pickNode(graph); //Take a new node
+				destination = pickNode(graph, nature); //Take a new node
 				
 				while(origin.getId() == destination.getId()){
-					destination = pickNode(graph);
+					destination = pickNode(graph, nature);
 				}
 				
 				data = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get(mode));	
 				
 			}
 		}
+
 		
-		
-		
-		public void randomTestAStar (String mapName, int nbTest, int mode) {//mode = 0 => Length; mode = 2 => Time
+		//mode=0 => Length; mode=2 => Time
+		// nature=0 => Random; nature=1 => Pseudorandom
+		public void randomTestAStar (String mapName, int nbTest, int mode, int nature) {
 
 			Graph graph = LireGraphe(pathMapsFolder + mapName);
 			ShortestPathData data;
@@ -223,17 +239,19 @@ public class ShortestPathTest {
 			AStarAlgorithm aStarAlgo;
 			ShortestPathSolution aStarSolution;
 			
-			
+			ShortestPathTestObserver observer = new ShortestPathTestObserver();
 			
 			Node origin;
 			Node destination;
 			
+			if(nature == 1){
+				PseudoRandom.initSequence();
+			}
 			
-			
-			origin = pickNode(graph);
-			destination = pickNode(graph);
+			origin = pickNode(graph, nature);
+			destination = pickNode(graph, nature);
 			while(origin.getId() == destination.getId()){
-				destination = pickNode(graph);
+				destination = pickNode(graph, nature);
 			}
 			
 			data = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get(mode));
@@ -241,12 +259,13 @@ public class ShortestPathTest {
 			bellmanAlgo = new BellmanFordAlgorithm(data);
 			bellmanSolution = bellmanAlgo.run();
 			
-			double [] bellmanCosts = bellmanAlgo.runMyTests();
+			double [] bellmanCosts = bellmanAlgo.getArraySolution();
 			
 			double aStarResult;
 			for(int i=0; i<nbTest; i++){
 			
 				aStarAlgo = new AStarAlgorithm(data);
+				aStarAlgo.addObserver(observer);
 				aStarSolution = aStarAlgo.run();
 				
 				
@@ -258,9 +277,12 @@ public class ShortestPathTest {
 						aStarResult = aStarSolution.getPath().getLength();
 					else
 						aStarResult = aStarSolution.getPath().getMinimumTravelTime();
+					
+					assertEquals(aStarSolution.getPath().isValid(), true);
 				}
 				
-				try {
+				try {					
+					//assertEquals(observer.isGrowingCost(), true);
 					assertEquals(aStarResult, bellmanCosts[destination.getId()], epsilon);
 				}
 				catch(java.lang.AssertionError e) {
@@ -268,10 +290,10 @@ public class ShortestPathTest {
 					throw e;
 				}
 	            
-				destination = pickNode(graph); //Take a new node
+				destination = pickNode(graph, nature); //Take a new node
 				
 				while(origin.getId() == destination.getId()){
-					destination = pickNode(graph);
+					destination = pickNode(graph, nature);
 				}
 				
 				data = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get(mode));	
@@ -282,131 +304,7 @@ public class ShortestPathTest {
 		
 		
 		
-		public void randomSubpathTestDijkstra(String mapName, int nbTest, int mode) {//mode = 0 => Length; mode = 2 => Time
-			Graph graph = LireGraphe(pathMapsFolder + mapName);
-			ShortestPathData data;
-			
-			BellmanFordAlgorithm bellmanAlgo;
-			ShortestPathSolution bellmanSolution;
-			
-			DijkstraAlgorithm dijkstraAlgo;
-			ShortestPathSolution dijkstraSolution;
-			
-			
-			
-			Node origin;
-			Node destination;
-			
-			
-			
-			origin = pickNode(graph);
-			destination = pickNode(graph);
-			while(origin.getId() == destination.getId()){
-				destination = pickNode(graph);
-			}
-			
-			data = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get(mode));
-			
-			bellmanAlgo = new BellmanFordAlgorithm(data);
-			bellmanSolution = bellmanAlgo.run();
-			
-			int id;
-			
-			for(int i=0; i<nbTest; i++){
-			
-				dijkstraAlgo = new DijkstraAlgorithm(data);
-				dijkstraSolution = dijkstraAlgo.run();
-				
-				Label [] mapDijkstra = dijkstraAlgo.getMapLabel();
-				double [] bellmanCosts = bellmanAlgo.runMyTests();
-				
-				Assume.assumeTrue(mapDijkstra.length == graph.size()); //DijkstraAlgo correspond to the right graph
-				
-				
-				Arc arc = mapDijkstra[data.getDestination().getId()].getFather();
-				
-				while ( arc != null ) {
-					id = arc.getDestination().getId();
-					assertEquals(mapDijkstra[id].getCost(), bellmanCosts[id], epsilon);
-	            	arc=mapDijkstra[arc.getOrigin().getId()].getFather();
-	            }
-				
-				destination = pickNode(graph); //Take a new node
-				
-				while(origin.getId() == destination.getId()){
-					destination = pickNode(graph);
-				}
-				
-				data = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get(mode));	
-				
-			}
-		}
-		
-		
-
-		public void randomSubpathTestAStar(String mapName, int nbTest, int mode) {//mode = 0 => Length; mode = 2 => Time
-			Graph graph = LireGraphe(pathMapsFolder + mapName);
-			ShortestPathData data;
-			
-			BellmanFordAlgorithm bellmanAlgo;
-			ShortestPathSolution bellmanSolution;
-			
-			AStarAlgorithm aStarAlgo;
-			ShortestPathSolution aStarSolution;
-			
-			
-			
-			Node origin;
-			Node destination;
-			
-			
-			
-			origin = pickNode(graph);
-			destination = pickNode(graph);
-			while(origin.getId() == destination.getId()){
-				destination = pickNode(graph);
-			}
-			
-			data = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get(mode));
-			
-			bellmanAlgo = new BellmanFordAlgorithm(data);
-			bellmanSolution = bellmanAlgo.run();
-			
-			int id;
-			
-			for(int i=0; i<nbTest; i++){
-			
-				aStarAlgo = new AStarAlgorithm(data);
-				aStarSolution = aStarAlgo.run();
-				
-				Label [] mapAStar = aStarAlgo.getMapLabel();
-				double [] bellmanCosts = bellmanAlgo.runMyTests();
-				
-				Assume.assumeTrue(mapAStar.length == graph.size()); //AStarAlgo correspond to the right graph
-				
-				
-				Arc arc = mapAStar[data.getDestination().getId()].getFather();
-				
-				while ( arc != null ) {
-					id = arc.getDestination().getId();
-					assertEquals(mapAStar[id].getCost(), bellmanCosts[id], epsilon);
-					
-	            	arc=mapAStar[arc.getOrigin().getId()].getFather();
-	            }
-				
-				destination = pickNode(graph); //Take a new node
-				
-				while(origin.getId() == destination.getId()){
-					destination = pickNode(graph);
-				}
-				
-				data = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get(mode));	
-				
-			}
-		}
-		
-		
-		public void randomNoPathTestAStar(String mapName) {
+		public void noPathTestAStar(String mapName) {
 			Graph graph = LireGraphe(pathMapsFolder + mapName);
 			WeaklyConnectedComponentsData dataWeakConn;
 			ShortestPathData dataShortest;
@@ -418,6 +316,7 @@ public class ShortestPathTest {
 			AStarAlgorithm aStarAlgo;
 			ShortestPathSolution aStarSolution;
 			
+			ShortestPathTestObserver observer = new ShortestPathTestObserver();
 			
 			int nbComponent;
 			
@@ -434,7 +333,7 @@ public class ShortestPathTest {
 			
 			if(nbComponent == 1)
 			{
-				System.out.println("< " + mapName + " > is one connected component !");
+				System.out.println("< " + mapName + " > is a connected graph !");
 			}
 			/*else
 			{
@@ -443,33 +342,36 @@ public class ShortestPathTest {
 			
 			
 			Assume.assumeTrue(nbComponent == 2);
-		
-			int randomId = (int) Math.random()*weakConnSolution.getComponents().get(0).size();
-			origin = weakConnSolution.getComponents().get(0).get(randomId);
-			randomId = (int) Math.random()*weakConnSolution.getComponents().get(1).size();
-			destination = weakConnSolution.getComponents().get(1).get(randomId);
 			
-			System.out.println( origin.getId() + " to " + destination.getId() + " on map " + mapName + " have not any path between");
+			PseudoRandom.initSequence();
+		
+			int randomId = PseudoRandom.generate(weakConnSolution.getComponents().get(0).size());
+			origin = weakConnSolution.getComponents().get(0).get(randomId);
+			randomId = PseudoRandom.generate(weakConnSolution.getComponents().get(1).size());
+			destination = weakConnSolution.getComponents().get(1).get(randomId);
 			
 			dataShortest = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get(0));
 		
 			bellmanAlgo = new BellmanFordAlgorithm(dataShortest);
 			bellmanSolution = bellmanAlgo.run();
 			
-			double [] bellmanCosts = bellmanAlgo.runMyTests();
+			double [] bellmanCosts = bellmanAlgo.getArraySolution();
 			
 			Assume.assumeTrue("A path is found, weaklyComponentClass does not work !", bellmanCosts[destination.getId()] == Double.POSITIVE_INFINITY);
 					
 			
 			aStarAlgo = new AStarAlgorithm(dataShortest);
+			aStarAlgo.addObserver(observer);
 			aStarSolution = aStarAlgo.run();
 			
+			//assertEquals(observer.isGrowingCost(), true);
 			assertEquals(aStarSolution.getPath(), null);		
 		
 		}
 		
 		
-		public void randomNoPathTestDijkstra(String mapName) {
+		public void noPathTestDijkstra(String mapName) {
+			
 			Graph graph = LireGraphe(pathMapsFolder + mapName);
 			WeaklyConnectedComponentsData dataWeakConn;
 			ShortestPathData dataShortest;
@@ -481,6 +383,7 @@ public class ShortestPathTest {
 			DijkstraAlgorithm dijkstraAlgo;
 			ShortestPathSolution dijkstraSolution;
 			
+			ShortestPathTestObserver observer = new ShortestPathTestObserver();
 			
 			int nbComponent;
 			
@@ -497,65 +400,107 @@ public class ShortestPathTest {
 			
 			if(nbComponent == 1)
 			{
-				System.out.println("< " + mapName + " > is one connected component !");
+				System.out.println("< " + mapName + " > is a connected graph !");
 			}
-			/*else
-			{
-				System.out.println(nbComponent + " = nbComponent found !");
-			}*/
 			
 			
 			Assume.assumeTrue(nbComponent == 2);
 		
-			int randomId = (int) Math.random()*weakConnSolution.getComponents().get(0).size();
+			PseudoRandom.initSequence();
+			int randomId = PseudoRandom.generate(weakConnSolution.getComponents().get(0).size());
 			origin = weakConnSolution.getComponents().get(0).get(randomId);
-			randomId = (int) Math.random()*weakConnSolution.getComponents().get(1).size();
+			randomId = PseudoRandom.generate(weakConnSolution.getComponents().get(1).size());
 			destination = weakConnSolution.getComponents().get(1).get(randomId);
 			
-			System.out.println( origin.getId() + " to " + destination.getId() + " on map " + mapName + " have not any path between");
-			
+		
 			dataShortest = new ShortestPathData(graph, origin, destination, ArcInspectorFactory.getAllFilters().get(0));
 		
 			bellmanAlgo = new BellmanFordAlgorithm(dataShortest);
 			bellmanSolution = bellmanAlgo.run();
 			
-			double [] bellmanCosts = bellmanAlgo.runMyTests();
+			double [] bellmanCosts = bellmanAlgo.getArraySolution();
 			
-			Assume.assumeTrue("A path is found, weaklyComponentClass does not work !", bellmanCosts[destination.getId()] == Double.POSITIVE_INFINITY);
+			Assume.assumeTrue("A path has been found, weaklyComponentClass does not work !", bellmanCosts[destination.getId()] == Double.POSITIVE_INFINITY);
 					
 			
 			dijkstraAlgo = new DijkstraAlgorithm(dataShortest);
+			dijkstraAlgo.addObserver(observer);
 			dijkstraSolution = dijkstraAlgo.run();
 			
+			assertEquals(observer.isGrowingCost(), true);
 			assertEquals(dijkstraSolution.getPath(), null);		
 		
 		}
 		
+		
+		
+		
+		// Campangne AStar
+		
 		@Test
-		public void randomTestsAStar() {
-			//randomTestAStar(".mapgr", 10, 0); // Length
-			//randomTestAStar("toulouse.mapgr", 10, 2); // Time
-			
-			//randomSubpathTestAStar("toulouse.mapgr", 10, 2); // Time
-			//randomSubpathTestAStar("toulouse.mapgr", 10, 0); // Length
-			
-			//randomNoPathTestAStar("fractal.mapgr");
-			randomNoPathTestAStar("benin.mapgr");
-			randomNoPathTestAStar("insa.mapgr");
-			
+		public void test_AStar_BENIN_Length_PseudoRandom(){
+			randomTestAStar("benin.mapgr", 1, 0, 1); // Length, PseudoRandom
+		}
+		
+		@Test
+		public void test_AStar_BENIN_Length_Random(){
+			randomTestAStar("benin.mapgr", 1, 0, 0); // Length, Random
+		}
+		
+		@Test
+		public void test_AStar_BENIN_Time_PseudoRandom(){
+			randomTestAStar("benin.mapgr", 1, 2, 1); // Time, PseudoRandom
+		}
+		
+		@Test
+		public void test_AStar_BENIN_Time_Random(){
+			randomTestAStar("benin.mapgr", 1, 2, 0); // Time, Random
 		}
 		
 		
 		@Test
-		public void randomTestsDijkstra() {
-			/*randomTestDijkstra("toulouse.mapgr", 10, 0); // Length
-			randomTestDijkstra("toulouse.mapgr", 10, 2); // Time
-			
-			randomSubpathTestDijkstra("toulouse.mapgr", 10, 2); // Time
-			randomSubpathTestDijkstra("toulouse.mapgr", 10, 0); // Length*/
-			randomNoPathTestDijkstra("benin.mapgr");
-			randomNoPathTestDijkstra("insa.mapgr");
+		public void test_AStar_FRACTAL_noPath(){
+			noPathTestAStar("fractal.mapgr");
 		}
+		
+		@Test
+		public void test_AStar_INSA_noPath(){
+			noPathTestAStar("insa.mapgr");
+		}
+		
+		
+		// Campangne DIJKSTRA
+		
+		@Test
+		public void test_Dijkstra_BENIN_Length_PseudoRandom(){
+			randomTestDijkstra("benin.mapgr", 1, 0, 1); // Length, PseudoRandom
+		}
+		
+		@Test
+		public void test_Dijkstra_BENIN_Length_Random(){
+			randomTestDijkstra("benin.mapgr", 1, 0, 0); // Length, Random
+		}
+		
+		@Test
+		public void test_Dijkstra_BENIN_Time_PseudoRandom(){
+			randomTestDijkstra("benin.mapgr", 1, 2, 1); // Time, PseudoRandom
+		}
+		
+		@Test
+		public void test_Dijkstra_BENIN_Time_Random(){
+			randomTestDijkstra("benin.mapgr", 1, 2, 0); // Time, Random
+		}
+		
+		@Test
+		public void test_Dijkstra_FRACTAL_noPath(){
+			noPathTestDijkstra("fractal.mapgr");
+		}
+		
+		@Test
+		public void test_Dijkstra_INSA_noPath(){
+			noPathTestDijkstra("insa.mapgr");
+		}
+		
 		
 		
 		

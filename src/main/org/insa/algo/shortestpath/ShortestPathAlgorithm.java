@@ -55,6 +55,20 @@ public abstract class ShortestPathAlgorithm extends AbstractAlgorithm<ShortestPa
             obs.notifyNodeMarked(node);
         }
     }
+    
+    /**
+     * Notify all observers that a label has been marked, i.e. its final value has
+     * been set.
+     * 
+     * @param node Node that has been marked.
+     */
+    public void notifyLabelMarked(Label label) {
+        for (ShortestPathObserver obs: getObservers()) {
+            obs.notifyLabelMarked(label);
+        }
+    }
+    
+    
     public void notifyHeapInsertion(int size) {
     	for (ShortestPathObserver obs: getObservers()) {
             obs.notifyHeapInsertion(size);

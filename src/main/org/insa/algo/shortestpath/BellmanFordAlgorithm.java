@@ -104,7 +104,7 @@ public class BellmanFordAlgorithm extends ShortestPathAlgorithm {
         return solution;
     }
     
-    public double [] runMyTests(){
+    public double [] getArraySolution(){
     	return distances;
     }
 

@@ -19,6 +19,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
     }
     public Label[] map;
     protected ShortestPathData data;
+    
     @Override
     protected ShortestPathSolution doRun() {
     	
@@ -57,6 +58,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         	
         	labelCurrentNode.setMarque(true);
         	notifyNodeMarked(labelCurrentNode.getNode());
+        	notifyLabelMarked(labelCurrentNode);
         	for(Arc a : labelCurrentNode.getNode().getSuccessors()) {
         		// Small test to check allowed roads...
                 if (data.isAllowed(a)) {
@@ -132,7 +134,8 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         return solution;
     }
     
-    public Label[] getMapLabel(){
+
+	public Label[] getMapLabel(){
     	return map;
     }
     protected void initLabel(Graph graph) {

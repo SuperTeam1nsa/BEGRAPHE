@@ -2,7 +2,6 @@ package org.insa.graph;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -350,7 +349,6 @@ public class Path {
      *  Need to be implemented.
      */
     public double getMinimumTravelTime() {
-        // TODO:
     	double r=0;
     	for(Arc a:this.arcs)
     	{

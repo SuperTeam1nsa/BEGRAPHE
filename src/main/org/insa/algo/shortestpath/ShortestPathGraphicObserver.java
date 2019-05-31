@@ -44,4 +44,10 @@ public class ShortestPathGraphicObserver implements ShortestPathObserver {
 		
 	}
 
+	@Override
+	public void notifyLabelMarked(Label label) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -26,6 +26,14 @@ public interface ShortestPathObserver {
 	 * @param node Node that has been marked.
 	 */
 	public void notifyNodeMarked(Node node);
+	
+	/**
+	 * Notify the observer that a node has been marked, i.e. its final
+	 * value has been set.
+	 * 
+	 * @param node Node that has been marked.
+	 */
+	public void notifyLabelMarked(Label label);
 
 	/**
 	 * Notify the observer that the destination has been reached.

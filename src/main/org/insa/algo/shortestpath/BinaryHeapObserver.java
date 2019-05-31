@@ -86,6 +86,14 @@ public class BinaryHeapObserver implements ShortestPathObserver{
 		}
 	}
 
+
+
+	@Override
+	public void notifyLabelMarked(Label label) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	
 
 }
