@@ -19,7 +19,9 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
     }
     public Label[] map;
     protected ShortestPathData data;
-    
+    protected long initTime=0; 
+    protected long calculationTime=0;
+
     @Override
     protected ShortestPathSolution doRun() {
     	
@@ -30,9 +32,12 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         if (data.getDestination()!= null && data.getOrigin().getId() == data.getDestination().getId()){
         	return new ShortestPathSolution(data, Status.TRIVIAL);
         }
-
+        
+        
+        long startTime=System.nanoTime();  
         initLabel(graph);
-      
+        long midTime=System.nanoTime();
+        initTime=midTime-startTime; 
         //Initialisation du coût du noeud initial à 0
         map[data.getOrigin().getId()].setCost(0);
         
@@ -105,7 +110,11 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         	}
         } while( !tas.isEmpty() && (data.getDestination()==null || labelCurrentNode.getNode().getId()!=data.getDestination().getId()));
         ShortestPathSolution solution = null;
-
+        
+        
+        long endTime=System.nanoTime(); 
+        calculationTime=endTime-midTime; 
+        
         // Destination has no predecessor, the solution is infeasible...
         if (data.getDestination()==null || map[data.getDestination().getId()].getFather() == null) {
             solution = new ShortestPathSolution(data, Status.INFEASIBLE);
@@ -134,6 +143,21 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         return solution;
     }
     
+    public Label[] getMap() {
+		return map;
+	}
+
+	public ShortestPathData getData() {
+		return data;
+	}
+	
+	public long getInitTime() {
+		return initTime;
+	}
+	public long getCalculationTime() {
+		return calculationTime;
+	}
+
 
 	public Label[] getMapLabel(){
     	return map;

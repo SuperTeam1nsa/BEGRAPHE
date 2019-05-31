@@ -214,7 +214,7 @@ public class TestPerformances {
     
     while (sc2.hasNextLine()) {
         s2 = new Scanner(sc2.nextLine());
-        ShortestPathAlgorithm algorithm=null;
+       // ShortestPathAlgorithm algorithm=null;
         ShortestPathSolution solution=null;
         ShortestPathData data=null; 
         
@@ -235,30 +235,23 @@ public class TestPerformances {
             	
     			BinaryHeapObserver myObserver=new BinaryHeapObserver(); 
 
-            	algorithm=new BellmanFordAlgorithm (data);
+    			BellmanFordAlgorithm algorithm=new BellmanFordAlgorithm (data);
             	solution=algorithm.run();
           
             	if (solution.getStatus()==Status.OPTIMAL) 
             	{if (mode==0)
             	{
-            	output.append(Double.toString(solution.getPath().getLength()));
+            	output.append(Double.toString(solution.getPath().getLength())); //resultat en distance
             	}
             	else 
             	{
-                	output.append(Double.toString(solution.getPath().getMinimumTravelTime()));
+                	output.append(Double.toString(solution.getPath().getMinimumTravelTime())); //résultat en temps
 
             	}
-            	/*
-            	String zerosFilling=""; 
-            	for  (int z=0;z<9-(Long.toString(solution.getSolvingTime().getNano())).length();z++)
-            	{
-            		zerosFilling+="0";
-            	}
-            	output.append(" " +Long.toString(solution.getSolvingTime().getSeconds())+"."+zerosFilling+ Long.toString(solution.getSolvingTime().getNano()));
-            	
-            	*/
-            	output.append(" " +Long.toString(solution.getSolvingTime().toNanos()));
-            	output.append(" "+Integer.toString(solution.getPath().getArcs().size()));
+            
+            	output.append(" " +Long.toString(solution.getSolvingTime().toNanos())); //temps chnometré par les méthodes fournies
+            	output.append(" "+Integer.toString(solution.getPath().getArcs().size())); // nb noeuds-1 
+            	algorithm=null; // Précaution pour que le Garbage Collector puisse supprimer les données par la suite
             	
             	}
             	}
@@ -270,34 +263,35 @@ public class TestPerformances {
             	
     			BinaryHeapObserver myObserver=new BinaryHeapObserver(); 
 
-            	algorithm=new DijkstraAlgorithm (data);
+    			DijkstraAlgorithm  algorithm=new DijkstraAlgorithm (data);
             	algorithm.addObserver(myObserver);
             	solution=algorithm.run();
          
             	if (solution.getStatus()==Status.OPTIMAL) 
             	{if (mode==0)
             	{
-            	output.append(Double.toString(solution.getPath().getLength()));
+            	output.append(Double.toString(solution.getPath().getLength())); //resultat en distance
             	}
             	else 
             	{
-                	output.append(Double.toString(solution.getPath().getMinimumTravelTime()));
+                	output.append(Double.toString(solution.getPath().getMinimumTravelTime())); //résultat en temps
 
             	}
             	
-            	/*
-            	String zerosFilling=""; 
-            	for  (int z=0;z<9-(Long.toString(solution.getSolvingTime().getNano())).length();z++)
-            	{
-            		zerosFilling+="0";
-            	}
-            	output.append(" " +Long.toString(solution.getSolvingTime().getSeconds())+"."+zerosFilling+ Long.toString(solution.getSolvingTime().getNano()));
             	
-            	*/
-            	output.append(" " +Long.toString(solution.getSolvingTime().toNanos()));
-            	output.append(" "+ Integer.toString(myObserver.getNb_explores()) + " "+ Integer.toString((myObserver.getNb_explores()))+" "+Integer.toString(myObserver.getMax_tas()));
-            	output.append(" "+Integer.toString(solution.getPath().getArcs().size()));
+            	output.append(" " +Long.toString(solution.getSolvingTime().toNanos())); //temps chnometré par les méthodes fournies
             	
+            	
+            	/* 
+            	  utilisation de l'observer pour récuperer les informations qui'il a récupéré (nb explorés, marqués et nb d'éléments max du tas) 
+            	 */
+            	output.append(" "+ Integer.toString(myObserver.getNb_explores()) + " "+ Integer.toString((myObserver.getNb_marques()))+" "+Integer.toString(myObserver.getMax_tas())); 
+            	
+            	
+            	output.append(" "+Integer.toString(solution.getPath().getArcs().size())); // nb noeuds-1 
+            	output.append(" " +Long.toString(algorithm.getInitTime()));  //utilisation de la méthode (implémentée par nous) pour récuperer le temps d'initialisation des labels
+            	output.append(" " +Long.toString(algorithm.getCalculationTime()));  //utilisation de la méthode (implémentée par nous) pour récuperer le temps de calcul 
+            	algorithm=null; 
             	}
 
             }
@@ -305,33 +299,31 @@ public class TestPerformances {
             {
     			BinaryHeapObserver myObserver=new BinaryHeapObserver(); 
 
-            	algorithm=new AStarAlgorithm (data);
+    			AStarAlgorithm algorithm=new AStarAlgorithm (data);
             	algorithm.addObserver(myObserver);
             	solution=algorithm.run();
             	
             	if (solution.getStatus()==Status.OPTIMAL) 
             	{if (mode==0)
             	{
-            	output.append(Double.toString(solution.getPath().getLength()));
+            	output.append(Double.toString(solution.getPath().getLength())); //resultat en distance
             	}
             	else 
             	{
-                	output.append(Double.toString(solution.getPath().getMinimumTravelTime()));
+                	output.append(Double.toString(solution.getPath().getMinimumTravelTime())); //résultat en temps
 
             	}
-            	/*
-            	String zerosFilling=""; 
-            	for  (int z=0;z<9-(Long.toString(solution.getSolvingTime().getNano())).length();z++)
-            	{
-            		zerosFilling+="0";
-            	}
-            	output.append(" " +Long.toString(solution.getSolvingTime().getSeconds())+"."+zerosFilling+ Long.toString(solution.getSolvingTime().getNano()));
+            
+            	output.append(" " +Long.toString(solution.getSolvingTime().toNanos())); //temps chnometré par les méthodes fournies
             	
-            	*/
-            	output.append(" " +Long.toString(solution.getSolvingTime().toNanos()));
-            	output.append(" "+ Integer.toString(myObserver.getNb_explores()) + " "+ Integer.toString((myObserver.getNb_explores()))+" "+Integer.toString(myObserver.getMax_tas()));
-            	output.append(" "+Integer.toString(solution.getPath().getArcs().size()));
-            		
+            	/* 
+           	  utilisation de l'observer pour récuperer les informations qui'il a récupéré (nb explorés, marqués et nb d'éléments max du tas) 
+           	 */
+            	output.append(" "+ Integer.toString(myObserver.getNb_explores()) + " "+ Integer.toString((myObserver.getNb_marques()))+" "+Integer.toString(myObserver.getMax_tas()));
+            	output.append(" "+Integer.toString(solution.getPath().getArcs().size())); // nb noeuds-1  
+            	output.append(" " +Long.toString(algorithm.getInitTime()));  //utilisation de la méthode (implémentée par nous) pour récuperer le temps d'initialisation des labels
+            	output.append(" " +Long.toString(algorithm.getCalculationTime()));  //utilisation de la méthode (implémentée par nous) pour récuperer le temps de calcul 
+            	algorithm=null; 
             	}
             }
             	
@@ -339,7 +331,7 @@ public class TestPerformances {
             
         }
         output.newLine();
-        algorithm=null; 
+        
         System.gc();
     }
     output.close();
@@ -362,11 +354,39 @@ public class TestPerformances {
 		{String carte=f.getName().substring(0,f.getName().length()-6);
 		System.out.println(carte);
 		int modeInspector=0;
-		int nbPair=200;
+		int nbPair=50;
 		
 		
-		
+		//Mode distance 
 		String modeInspectorString;
+		if (modeInspector==0)
+			modeInspectorString="distance"; 
+		else 
+			modeInspectorString="temps"; 
+		
+	
+		
+		createTestFiles(carte,modeInspector,nbPair);
+		System.out.println(carte+ " " +modeInspectorString +" DONE CREATING FILES");
+		
+		//Dernier parametre: 0 = bellman , 1= dijkstra, 2=astar
+		
+		readTestFiles(testResultPath+"//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",0);
+		System.out.println(carte+ " " +modeInspectorString +" Bellman done");
+
+
+		readTestFiles(testResultPath+"//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",1);
+		System.out.println(carte+ " " +modeInspectorString +" Dijkstra Done");
+		
+
+		readTestFiles(testResultPath+"//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",2);
+		System.out.println(carte+ " " +modeInspectorString +" Astar Done");
+
+		
+		
+		
+		//Passage en Mode temps 
+		modeInspector=1;
 		if (modeInspector==0)
 			modeInspectorString="distance"; 
 		else 
@@ -374,22 +394,23 @@ public class TestPerformances {
 		
 		
 		createTestFiles(carte,modeInspector,nbPair);
-		
-		
-		//Dernier parametre: 0 = bellman , 1= dijkstra, 2=astar
+		System.out.println(carte+ " " +modeInspectorString +" DONE CREATING FILES");
+
 		readTestFiles(testResultPath+"//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",0);
-		readTestFiles(testResultPath+"//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",1);
-		readTestFiles(testResultPath+"//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",2);
+		System.out.println(carte+ " " +modeInspectorString +"Bellman done");
 		
-		modeInspector=1;
-		if (modeInspector==0)
-			modeInspectorString="distance"; 
-		else 
-			modeInspectorString="temps"; 
 		
-		readTestFiles(testResultPath+"//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",0);
 		readTestFiles(testResultPath+"//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",1);
+		System.out.println(carte+ " " +modeInspectorString +" Dijkstra Done");
+
+		
 		readTestFiles(testResultPath+"//"+carte+"//"+carte+"_"+modeInspectorString+"_"+Integer.toString(nbPair)+".txt",2);
+		System.out.println(carte+ " " +modeInspectorString +" Astar Done");
+	
+		
+		 	
+
+	
 		}
 		
 	}
